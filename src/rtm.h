@@ -19,7 +19,7 @@
 #ifndef RTM_H
 #define RTM_H
 
-#include "rtmapi_global.h"
+#include "libqrtm_global.h"
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>

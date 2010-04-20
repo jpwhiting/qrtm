@@ -106,7 +106,7 @@
     <value type="QString">XDG_SESSION_COOKIE=b9c7bd6d24a08aec96107fee4bc9d8bf-1271755787.149782-1845442103</value>
    </valuelist>
    <valuelist key="abstractProcess.arguments" type="QVariantList">
-    <value type="QString">/media/Disk/Documents/Projects/lib-qrtm/lib-qrtm.pro</value>
+    <value type="QString">/media/Disk/Documents/Projects/lib-qrtm/libqrtm.pro</value>
     <value type="QString">-spec</value>
     <value type="QString">linux-g++</value>
     <value type="QString">-r</value>

@@ -3,7 +3,7 @@
 # -------------------------------------------------
 QT += network \
     webkit
-TARGET = rtmapi
+TARGET = libqrtm
 TEMPLATE = lib
 DEFINES += RTMAPI_LIBRARY
 SOURCES += src/loginview.cpp \
@@ -19,7 +19,7 @@ SOURCES += src/loginview.cpp \
     src/libqjson/json_parser.cc \
     src/authentication.cpp \
     src/main.cpp
-HEADERS += src/rtmapi_global.h \
+HEADERS += src/libqrtm_global.h \
     src/loginview.h \
     src/request.h \
     src/rtm.h \
