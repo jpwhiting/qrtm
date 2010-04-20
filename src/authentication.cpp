@@ -96,7 +96,7 @@ void RTM::Authentication::requestToken()
 
     tokenRequest->addArgument("api_key", apiKey);
     tokenRequest->addArgument("frob", frob);
-    tokenRequest->addArgument("method", "rtm.auth.requestToken");
+    tokenRequest->addArgument("method", "rtm.auth.getToken");
     tokenRequest->sendRequest();
 }
 
