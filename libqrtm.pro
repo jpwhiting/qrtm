@@ -18,7 +18,8 @@ SOURCES += src/loginview.cpp \
     src/libqjson/json_scanner.cpp \
     src/libqjson/json_parser.cc \
     src/authentication.cpp \
-    src/main.cpp
+    src/main.cpp \
+    src/merih_deneme.cpp
 HEADERS += src/libqrtm_global.h \
     src/loginview.h \
     src/request.h \
