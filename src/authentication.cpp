@@ -32,6 +32,45 @@ RTM::Authentication::Authentication(QString key, QString sharedSecret, RTM::Perm
     connect(this, SIGNAL(requestError(RTM::RtmException)), this, SIGNAL(authError(RTM::RtmException)));
 }
 
+inline void RTM::Authentication::setApiKey(QString key)
+{
+    apiKey = key;
+}
+
+inline void RTM::Authentication::setSharedSecret(QString secret)
+{
+    sharedSecret = secret;
+}
+
+inline void RTM::Authentication::setPermission(RTM::Permission perm)
+{
+    permission = perm;
+}
+
+inline void RTM::Authentication::setToken(QString tok) {
+    token = tok;
+}
+
+inline QString RTM::Authentication::getApiKey()
+{
+    return apiKey;
+}
+
+inline QString RTM::Authentication::getSharedSecret()
+{
+    return sharedSecret;
+}
+
+inline RTM::Permission RTM::Authentication::getPermission()
+{
+    return permission;
+}
+
+inline QString RTM::Authentication::getToken()
+{
+    return token;
+}
+
 void RTM::Authentication::beginAuth()
 {
     if(frob.isEmpty()) {
@@ -119,9 +158,4 @@ QString RTM::Authentication::getPermission(RTM::Permission p)
     default:
         return "";
     }
-}
-
-QString RTM::Authentication::getToken()
-{
-    return token;
 }

@@ -33,7 +33,15 @@ namespace RTM
 
     public:
 	Authentication(QString key, QString secret, RTM::Permission perms, QString token = "", QObject *parent = 0);
-        QString getToken();
+	void setApiKey(QString key);
+	void setSharedSecret(QString secret);
+	void setPermission(RTM::Permission perm);
+	void setToken(QString tok);
+	QString getApiKey();
+	QString getSharedSecret();
+	RTM::Permission getPermission();
+	QString getToken();
+
     protected:
         QString getPermission(RTM::Permission p);
 
