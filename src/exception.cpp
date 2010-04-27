@@ -23,3 +23,10 @@ RTM::Exception::Exception(RTM::ErrorCode eCode, QString eMessage, QMap<QString, 
 	code(eCode), message(eMessage), arguments(args)
 {
 }
+
+QString RTM::Exception::getErrorInfo()
+{
+    QString num;
+    num.setNum((int) code);
+    return "Code: " + num + "\nMsg:\n" + message;
+}

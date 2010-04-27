@@ -29,6 +29,7 @@ namespace RTM
     {
     public:
 	Exception(RTM::ErrorCode eCode = RTM::Malformed, QString eMessage = "", QMap<QString, QString> args = QMap<QString, QString>());
+	QString getErrorInfo();
 
     protected:
 	RTM::ErrorCode code;
