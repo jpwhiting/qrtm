@@ -45,8 +45,8 @@ OBJECTS_DIR   = ./
 
 SOURCES       = src/loginview.cpp \
 		src/request.cpp \
-		src/rtmexception.cpp \
-		src/rtmservice.cpp \
+		src/exception.cpp \
+		src/service.cpp \
 		src/libqjson/serializerrunnable.cpp \
 		src/libqjson/serializer.cpp \
 		src/libqjson/qobjecthelper.cpp \
@@ -57,14 +57,14 @@ SOURCES       = src/loginview.cpp \
 		src/authentication.cpp \
 		src/main.cpp moc_loginview.cpp \
 		moc_request.cpp \
-		moc_rtmservice.cpp \
+		moc_service.cpp \
 		moc_serializerrunnable.cpp \
 		moc_parserrunnable.cpp \
 		moc_authentication.cpp
 OBJECTS       = loginview.o \
 		request.o \
-		rtmexception.o \
-		rtmservice.o \
+		exception.o \
+		service.o \
 		serializerrunnable.o \
 		serializer.o \
 		qobjecthelper.o \
@@ -76,7 +76,7 @@ OBJECTS       = loginview.o \
 		main.o \
 		moc_loginview.o \
 		moc_request.o \
-		moc_rtmservice.o \
+		moc_service.o \
 		moc_serializerrunnable.o \
 		moc_parserrunnable.o \
 		moc_authentication.o
@@ -206,7 +206,7 @@ qmake:  FORCE
 
 dist:
 	@$(CHK_DIR_EXISTS) .tmp/libqrtm1.0.0 || $(MKDIR) .tmp/libqrtm1.0.0
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/libqrtm1.0.0/ && $(COPY_FILE) --parents src/libqrtm_global.h src/loginview.h src/request.h src/rtm.h src/rtmexception.h src/rtmservice.h src/libqjson/stack.hh src/libqjson/serializerrunnable.h src/libqjson/serializer.h src/libqjson/qobjecthelper.h src/libqjson/qjson_export.h src/libqjson/qjson_debug.h src/libqjson/position.hh src/libqjson/parserrunnable.h src/libqjson/parser_p.h src/libqjson/parser.h src/libqjson/location.hh src/libqjson/json_scanner.h src/libqjson/json_parser.hh src/authentication.h .tmp/libqrtm1.0.0/ && $(COPY_FILE) --parents src/loginview.cpp src/request.cpp src/rtmexception.cpp src/rtmservice.cpp src/libqjson/serializerrunnable.cpp src/libqjson/serializer.cpp src/libqjson/qobjecthelper.cpp src/libqjson/parserrunnable.cpp src/libqjson/parser.cpp src/libqjson/json_scanner.cpp src/libqjson/json_parser.cc src/authentication.cpp src/main.cpp .tmp/libqrtm1.0.0/ && (cd `dirname .tmp/libqrtm1.0.0` && $(TAR) libqrtm1.0.0.tar libqrtm1.0.0 && $(COMPRESS) libqrtm1.0.0.tar) && $(MOVE) `dirname .tmp/libqrtm1.0.0`/libqrtm1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/libqrtm1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/libqrtm1.0.0/ && $(COPY_FILE) --parents src/libqrtm_global.h src/loginview.h src/request.h src/rtm.h src/exception.h src/service.h src/libqjson/stack.hh src/libqjson/serializerrunnable.h src/libqjson/serializer.h src/libqjson/qobjecthelper.h src/libqjson/qjson_export.h src/libqjson/qjson_debug.h src/libqjson/position.hh src/libqjson/parserrunnable.h src/libqjson/parser_p.h src/libqjson/parser.h src/libqjson/location.hh src/libqjson/json_scanner.h src/libqjson/json_parser.hh src/authentication.h .tmp/libqrtm1.0.0/ && $(COPY_FILE) --parents src/loginview.cpp src/request.cpp src/exception.cpp src/service.cpp src/libqjson/serializerrunnable.cpp src/libqjson/serializer.cpp src/libqjson/qobjecthelper.cpp src/libqjson/parserrunnable.cpp src/libqjson/parser.cpp src/libqjson/json_scanner.cpp src/libqjson/json_parser.cc src/authentication.cpp src/main.cpp .tmp/libqrtm1.0.0/ && (cd `dirname .tmp/libqrtm1.0.0` && $(TAR) libqrtm1.0.0.tar libqrtm1.0.0 && $(COMPRESS) libqrtm1.0.0.tar) && $(MOVE) `dirname .tmp/libqrtm1.0.0`/libqrtm1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/libqrtm1.0.0
 
 
 clean:compiler_clean 
@@ -226,9 +226,9 @@ mocclean: compiler_moc_header_clean compiler_moc_source_clean
 
 mocables: compiler_moc_header_make_all compiler_moc_source_make_all
 
-compiler_moc_header_make_all: moc_loginview.cpp moc_request.cpp moc_rtmservice.cpp moc_serializerrunnable.cpp moc_parserrunnable.cpp moc_authentication.cpp
+compiler_moc_header_make_all: moc_loginview.cpp moc_request.cpp moc_service.cpp moc_serializerrunnable.cpp moc_parserrunnable.cpp moc_authentication.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_loginview.cpp moc_request.cpp moc_rtmservice.cpp moc_serializerrunnable.cpp moc_parserrunnable.cpp moc_authentication.cpp
+	-$(DEL_FILE) moc_loginview.cpp moc_request.cpp moc_service.cpp moc_serializerrunnable.cpp moc_parserrunnable.cpp moc_authentication.cpp
 moc_loginview.cpp: src/loginview.h
 	/usr/bin/moc-qt4 $(DEFINES) $(INCPATH) src/loginview.h -o moc_loginview.cpp
 
@@ -236,19 +236,19 @@ moc_request.cpp: src/rtm.h \
                 src/libqrtm_global.h \
 		src/libqjson/parser.h \
 		src/libqjson/qjson_export.h \
-		src/rtmexception.h \
+		src/exception.h \
 		src/request.h
 	/usr/bin/moc-qt4 $(DEFINES) $(INCPATH) src/request.h -o moc_request.cpp
 
-moc_rtmservice.cpp: src/rtm.h \
+moc_service.cpp: src/rtm.h \
                 src/libqrtm_global.h \
 		src/libqjson/parser.h \
 		src/libqjson/qjson_export.h \
 		src/authentication.h \
 		src/request.h \
-		src/rtmexception.h \
-		src/rtmservice.h
-	/usr/bin/moc-qt4 $(DEFINES) $(INCPATH) src/rtmservice.h -o moc_rtmservice.cpp
+		src/exception.h \
+		src/service.h
+	/usr/bin/moc-qt4 $(DEFINES) $(INCPATH) src/service.h -o moc_service.cpp
 
 moc_serializerrunnable.cpp: src/libqjson/qjson_export.h \
 		src/libqjson/serializerrunnable.h
@@ -263,7 +263,7 @@ moc_authentication.cpp: src/rtm.h \
 		src/libqjson/parser.h \
 		src/libqjson/qjson_export.h \
 		src/request.h \
-		src/rtmexception.h \
+		src/exception.h \
 		src/authentication.h
 	/usr/bin/moc-qt4 $(DEFINES) $(INCPATH) src/authentication.h -o moc_authentication.cpp
 
@@ -294,25 +294,25 @@ request.o: src/request.cpp src/request.h \
                 src/libqrtm_global.h \
 		src/libqjson/parser.h \
 		src/libqjson/qjson_export.h \
-		src/rtmexception.h
+		src/exception.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o request.o src/request.cpp
 
-rtmexception.o: src/rtmexception.cpp src/rtmexception.h \
+exception.o: src/exception.cpp src/exception.h \
 		src/rtm.h \
                 src/libqrtm_global.h \
 		src/libqjson/parser.h \
 		src/libqjson/qjson_export.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rtmexception.o src/rtmexception.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o exception.o src/exception.cpp
 
-rtmservice.o: src/rtmservice.cpp src/rtmservice.h \
+service.o: src/service.cpp src/service.h \
 		src/rtm.h \
                 src/libqrtm_global.h \
 		src/libqjson/parser.h \
 		src/libqjson/qjson_export.h \
 		src/authentication.h \
 		src/request.h \
-		src/rtmexception.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rtmservice.o src/rtmservice.cpp
+		src/exception.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o service.o src/service.cpp
 
 serializerrunnable.o: src/libqjson/serializerrunnable.cpp src/libqjson/serializerrunnable.h \
 		src/libqjson/qjson_export.h \
@@ -372,7 +372,7 @@ authentication.o: src/authentication.cpp src/authentication.h \
 		src/libqjson/parser.h \
 		src/libqjson/qjson_export.h \
 		src/request.h \
-		src/rtmexception.h
+		src/exception.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o authentication.o src/authentication.cpp
 
 main.o: src/main.cpp src/rtm.h \
@@ -381,7 +381,7 @@ main.o: src/main.cpp src/rtm.h \
 		src/libqjson/qjson_export.h \
 		src/authentication.h \
 		src/request.h \
-		src/rtmexception.h
+		src/exception.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o src/main.cpp
 
 moc_loginview.o: moc_loginview.cpp 
@@ -390,8 +390,8 @@ moc_loginview.o: moc_loginview.cpp
 moc_request.o: moc_request.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_request.o moc_request.cpp
 
-moc_rtmservice.o: moc_rtmservice.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_rtmservice.o moc_rtmservice.cpp
+moc_service.o: moc_service.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_service.o moc_service.cpp
 
 moc_serializerrunnable.o: moc_serializerrunnable.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_serializerrunnable.o moc_serializerrunnable.cpp

@@ -43,8 +43,8 @@ OBJECTS_DIR   = release
 SOURCES       = src\loginview.cpp \
 		src\request.cpp \
 		src\authentication.cpp \
-		src\rtmexception.cpp \
-		src\rtmservice.cpp \
+		src\exception.cpp \
+		src\service.cpp \
 		src\libqjson\serializerrunnable.cpp \
 		src\libqjson\serializer.cpp \
 		src\libqjson\qobjecthelper.cpp \
@@ -53,14 +53,14 @@ SOURCES       = src\loginview.cpp \
 		src\libqjson\json_scanner.cpp \
 		src\libqjson\json_parser.cc release\moc_loginview.cpp \
 		release\moc_request.cpp \
-		release\moc_rtmservice.cpp \
+		release\moc_service.cpp \
 		release\moc_serializerrunnable.cpp \
 		release\moc_parserrunnable.cpp
 OBJECTS       = release/loginview.o \
 		release/request.o \
 		release/authentication.o \
-		release/rtmexception.o \
-		release/rtmservice.o \
+		release/exception.o \
+		release/service.o \
 		release/serializerrunnable.o \
 		release/serializer.o \
 		release/qobjecthelper.o \
@@ -70,7 +70,7 @@ OBJECTS       = release/loginview.o \
 		release/json_parser.o \
 		release/moc_loginview.o \
 		release/moc_request.o \
-		release/moc_rtmservice.o \
+		release/moc_service.o \
 		release/moc_serializerrunnable.o \
 		release/moc_parserrunnable.o
 DIST          = 
@@ -111,7 +111,7 @@ dist:
         $(ZIP) libqrtm.zip $(SOURCES) $(DIST) libqrtm.pro c:\Qt\2010.02.1\qt\mkspecs\qconfig.pri c:\Qt\2010.02.1\qt\mkspecs\features\qt_functions.prf c:\Qt\2010.02.1\qt\mkspecs\features\qt_config.prf c:\Qt\2010.02.1\qt\mkspecs\features\exclusive_builds.prf c:\Qt\2010.02.1\qt\mkspecs\features\default_pre.prf c:\Qt\2010.02.1\qt\mkspecs\features\win32\default_pre.prf c:\Qt\2010.02.1\qt\mkspecs\features\release.prf c:\Qt\2010.02.1\qt\mkspecs\features\debug_and_release.prf c:\Qt\2010.02.1\qt\mkspecs\features\default_post.prf c:\Qt\2010.02.1\qt\mkspecs\features\win32\default_post.prf c:\Qt\2010.02.1\qt\mkspecs\features\build_pass.prf c:\Qt\2010.02.1\qt\mkspecs\features\win32\rtti.prf c:\Qt\2010.02.1\qt\mkspecs\features\win32\exceptions.prf c:\Qt\2010.02.1\qt\mkspecs\features\win32\stl.prf c:\Qt\2010.02.1\qt\mkspecs\features\shared.prf c:\Qt\2010.02.1\qt\mkspecs\features\dll.prf c:\Qt\2010.02.1\qt\mkspecs\features\warn_on.prf c:\Qt\2010.02.1\qt\mkspecs\features\qt.prf c:\Qt\2010.02.1\qt\mkspecs\features\win32\thread.prf c:\Qt\2010.02.1\qt\mkspecs\features\moc.prf c:\Qt\2010.02.1\qt\mkspecs\features\win32\windows.prf c:\Qt\2010.02.1\qt\mkspecs\features\resources.prf c:\Qt\2010.02.1\qt\mkspecs\features\uic.prf c:\Qt\2010.02.1\qt\mkspecs\features\yacc.prf c:\Qt\2010.02.1\qt\mkspecs\features\lex.prf c:\Qt\2010.02.1\qt\mkspecs\features\include_source_dir.prf  HEADERS RESOURCES IMAGES SOURCES OBJECTIVE_SOURCES FORMS YACCSOURCES YACCSOURCES LEXSOURCES
 
 clean: compiler_clean 
-	-$(DEL_FILE) release\loginview.o release\request.o release\authentication.o release\rtmexception.o release\rtmservice.o release\serializerrunnable.o release\serializer.o release\qobjecthelper.o release\parserrunnable.o release\parser.o release\json_scanner.o release\json_parser.o release\moc_loginview.o release\moc_request.o release\moc_rtmservice.o release\moc_serializerrunnable.o release\moc_parserrunnable.o
+	-$(DEL_FILE) release\loginview.o release\request.o release\authentication.o release\exception.o release\service.o release\serializerrunnable.o release\serializer.o release\qobjecthelper.o release\parserrunnable.o release\parser.o release\json_scanner.o release\json_parser.o release\moc_loginview.o release\moc_request.o release\moc_service.o release\moc_serializerrunnable.o release\moc_parserrunnable.o
         -$(DEL_FILE) .\build\win32\liblibqrtm.a
 
 distclean: clean
@@ -122,9 +122,9 @@ mocclean: compiler_moc_header_clean compiler_moc_source_clean
 
 mocables: compiler_moc_header_make_all compiler_moc_source_make_all
 
-compiler_moc_header_make_all: release/moc_loginview.cpp release/moc_request.cpp release/moc_rtmservice.cpp release/moc_serializerrunnable.cpp release/moc_parserrunnable.cpp
+compiler_moc_header_make_all: release/moc_loginview.cpp release/moc_request.cpp release/moc_service.cpp release/moc_serializerrunnable.cpp release/moc_parserrunnable.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) release\moc_loginview.cpp release\moc_request.cpp release\moc_rtmservice.cpp release\moc_serializerrunnable.cpp release\moc_parserrunnable.cpp
+	-$(DEL_FILE) release\moc_loginview.cpp release\moc_request.cpp release\moc_service.cpp release\moc_serializerrunnable.cpp release\moc_parserrunnable.cpp
 release/moc_loginview.cpp: src/loginview.h
 	C:/Qt/2010.02.1/qt/bin\moc.exe $(DEFINES) $(INCPATH) -D__GNUC__ -DWIN32 src\loginview.h -o release\moc_loginview.cpp
 
@@ -133,14 +133,14 @@ release/moc_request.cpp: src/rtm.h \
 		src/request.h
 	C:/Qt/2010.02.1/qt/bin\moc.exe $(DEFINES) $(INCPATH) -D__GNUC__ -DWIN32 src\request.h -o release\moc_request.cpp
 
-release/moc_rtmservice.cpp: src/rtm.h \
+release/moc_service.cpp: src/rtm.h \
                 src/libqrtm_global.h \
 		src/authentication.h \
 		src/request.h \
 		src/libqjson/parser.h \
 		src/libqjson/qjson_export.h \
-		src/rtmservice.h
-	C:/Qt/2010.02.1/qt/bin\moc.exe $(DEFINES) $(INCPATH) -D__GNUC__ -DWIN32 src\rtmservice.h -o release\moc_rtmservice.cpp
+		src/service.h
+	C:/Qt/2010.02.1/qt/bin\moc.exe $(DEFINES) $(INCPATH) -D__GNUC__ -DWIN32 src\service.h -o release\moc_service.cpp
 
 release/moc_serializerrunnable.cpp: src/libqjson/qjson_export.h \
 		src/libqjson/serializerrunnable.h
@@ -185,19 +185,19 @@ release/authentication.o: src/authentication.cpp src/authentication.h \
 		src/request.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\authentication.o src\authentication.cpp
 
-release/rtmexception.o: src/rtmexception.cpp src/rtmexception.h \
+release/exception.o: src/exception.cpp src/exception.h \
 		src/rtm.h \
                 src/libqrtm_global.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\rtmexception.o src\rtmexception.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\exception.o src\exception.cpp
 
-release/rtmservice.o: src/rtmservice.cpp src/rtmservice.h \
+release/service.o: src/service.cpp src/service.h \
 		src/rtm.h \
                 src/libqrtm_global.h \
 		src/authentication.h \
 		src/request.h \
 		src/libqjson/parser.h \
 		src/libqjson/qjson_export.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\rtmservice.o src\rtmservice.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\service.o src\service.cpp
 
 release/serializerrunnable.o: src/libqjson/serializerrunnable.cpp src/libqjson/serializerrunnable.h \
 		src/libqjson/qjson_export.h \
@@ -257,8 +257,8 @@ release/moc_loginview.o: release/moc_loginview.cpp
 release/moc_request.o: release/moc_request.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_request.o release\moc_request.cpp
 
-release/moc_rtmservice.o: release/moc_rtmservice.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_rtmservice.o release\moc_rtmservice.cpp
+release/moc_service.o: release/moc_service.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_service.o release\moc_service.cpp
 
 release/moc_serializerrunnable.o: release/moc_serializerrunnable.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_serializerrunnable.o release\moc_serializerrunnable.cpp

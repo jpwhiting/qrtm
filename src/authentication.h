@@ -21,7 +21,7 @@
 
 #include "rtm.h"
 #include "request.h"
-#include "rtmexception.h"
+#include "exception.h"
 
 class QString;
 
@@ -47,7 +47,7 @@ namespace RTM
 
     signals:
         void authFinished(QVariantMap auth);
-        void authError(RTM::RtmException ex);
+	void authError(RTM::Exception ex);
 
     public slots:
         void beginAuth();

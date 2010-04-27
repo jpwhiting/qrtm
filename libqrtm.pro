@@ -8,8 +8,6 @@ TEMPLATE = lib
 DEFINES += RTMAPI_LIBRARY
 SOURCES += src/loginview.cpp \
     src/request.cpp \
-    src/rtmexception.cpp \
-    src/rtmservice.cpp \
     src/libqjson/serializerrunnable.cpp \
     src/libqjson/serializer.cpp \
     src/libqjson/qobjecthelper.cpp \
@@ -19,13 +17,13 @@ SOURCES += src/loginview.cpp \
     src/libqjson/json_parser.cc \
     src/authentication.cpp \
     src/main.cpp \
-    src/merih_deneme.cpp
+    src/merih_deneme.cpp \
+    src/exception.cpp \
+    src/service.cpp
 HEADERS += src/libqrtm_global.h \
     src/loginview.h \
     src/request.h \
     src/rtm.h \
-    src/rtmexception.h \
-    src/rtmservice.h \
     src/libqjson/stack.hh \
     src/libqjson/serializerrunnable.h \
     src/libqjson/serializer.h \
@@ -39,7 +37,9 @@ HEADERS += src/libqrtm_global.h \
     src/libqjson/location.hh \
     src/libqjson/json_scanner.h \
     src/libqjson/json_parser.hh \
-    src/authentication.h
+    src/authentication.h \
+    src/exception.h \
+    src/service.h
 win32:DESTDIR = .\build\win32
 unix:DESTDIR = ./build/unix
 OTHER_FILES += src/libqjson/json_parser.yy

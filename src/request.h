@@ -26,7 +26,7 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 #include <QtCore/QVariantMap>
-#include "rtmexception.h"
+#include "exception.h"
 #include "libqjson/parser.h"
 
 
@@ -50,7 +50,7 @@ namespace RTM
 
     signals:
         void requestFinished(QVariantMap response);
-        void requestError(RTM::RtmException err);
+	void requestError(RTM::Exception err);
 
     public slots:
         void sendRequest();

@@ -29,7 +29,7 @@
 RTM::Authentication::Authentication(QString key, QString sharedSecret, RTM::Permission perms, QString token, QObject *parent) :
 	RTM::Request(sharedSecret, RTM::baseAuthUrl, RTM::Signed, parent), apiKey(key), token(token), permission(perms)
 {
-    connect(this, SIGNAL(requestError(RTM::RtmException)), this, SIGNAL(authError(RTM::RtmException)));
+    connect(this, SIGNAL(requestError(RTM::Exception)), this, SIGNAL(authError(RTM::Exception)));
 }
 
 inline void RTM::Authentication::setApiKey(QString key)
@@ -77,7 +77,7 @@ void RTM::Authentication::beginAuth()
         qDebug() << "Frob empty, new frob requested\n";
         frobRequest = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
         connect(frobRequest, SIGNAL(requestFinished(QVariantMap)), this, SLOT(frobReceived(QVariantMap)));
-        connect(frobRequest, SIGNAL(requestError(RTM::RtmException)), this, SIGNAL(authError(RTM::RtmException)));
+	connect(frobRequest, SIGNAL(requestError(RTM::Exception)), this, SIGNAL(authError(RTM::Exception)));
 
         frobRequest->addArgument("api_key", apiKey);
         frobRequest->addArgument("method", "rtm.auth.getFrob");
@@ -131,7 +131,7 @@ void RTM::Authentication::requestToken()
 
     tokenRequest = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
     connect(tokenRequest, SIGNAL(requestFinished(QVariantMap)), this, SLOT(tokenReceived(QVariantMap)));
-    connect(tokenRequest, SIGNAL(requestError(RTM::RtmException)), this, SIGNAL(authError(RTM::RtmException)));
+    connect(tokenRequest, SIGNAL(requestError(RTM::Exception)), this, SIGNAL(authError(RTM::Exception)));
 
     tokenRequest->addArgument("api_key", apiKey);
     tokenRequest->addArgument("frob", frob);

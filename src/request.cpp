@@ -117,10 +117,10 @@ void RTM::Request::responseReceived(QNetworkReply * reply)
             QVariantMap err = result["err"].toMap();
             QString code = err["code"].toString();
             QString msg = err["msg"].toString();
-            emit requestError(RTM::RtmException((RTM::ErrorCode)code.toInt(), msg));
+	    emit requestError(RTM::Exception((RTM::ErrorCode)code.toInt(), msg, arguments));
         }
     }
     else {
-        emit requestError(RTM::RtmException(RTM::Malformed, "Malformed response data"));
+	emit requestError(RTM::Exception(RTM::Malformed, "Malformed response data", arguments));
     }
 }
