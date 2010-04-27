@@ -121,16 +121,13 @@ void RTM::Request::responseReceived(QNetworkReply * reply)
         QString status = result["stat"].toString();
 
         if(status == "ok") {
-            emit requestFinished(result);
+	    emit requestFinished(result, RTM::OK);
         }
         else {
-            QVariantMap err = result["err"].toMap();
-            QString code = err["code"].toString();
-            QString msg = err["msg"].toString();
-	    emit requestError(RTM::Exception((RTM::ErrorCode)code.toInt(), msg, arguments));
+	    emit requestFinished(result, RTM::Fail);
         }
     }
     else {
-	emit requestError(RTM::Exception(RTM::Malformed, "Malformed response data", arguments));
+	emit requestFinished(result, RTM::Malformed);
     }
 }

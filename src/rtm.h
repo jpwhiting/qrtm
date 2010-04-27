@@ -29,7 +29,7 @@ namespace RTM
 {
     enum MethodType {Signed, Unsigned};
     enum Permission {Read, Write, Delete};
-    enum ErrorCode {Malformed = 0, WrongAPIKey = 90, Sign = 12, Etc};
+    enum ResponseStatus {Malformed = -1, Fail = 0, OK = 1};
 
     const QString baseMethodUrl = "http://api.rememberthemilk.com/services/rest/?";
     const QString baseAuthUrl = "http://www.rememberthemilk.com/services/auth/?";

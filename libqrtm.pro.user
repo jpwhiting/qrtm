@@ -73,7 +73,7 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-AFMNHMe8bT,guid=e58b2134288f0050331b271e4bd61d6a</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-Bc3vx1nBSR,guid=ace265216bdc324522e6f6144bd6b538</value>
     <value type="QString">DEFAULTS_PATH=/usr/share/gconf/gnome.default.path</value>
     <value type="QString">DESKTOP_SESSION=gnome</value>
     <value type="QString">DISPLAY=:0.0</value>
@@ -81,8 +81,8 @@
     <value type="QString">GDM_KEYBOARD_LAYOUT=us</value>
     <value type="QString">GDM_LANG=tr_TR.utf8</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-26H3Wv</value>
-    <value type="QString">GNOME_KEYRING_PID=14342</value>
+    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-65YQM2</value>
+    <value type="QString">GNOME_KEYRING_PID=2073</value>
     <value type="QString">GTK_MODULES=canberra-gtk-module</value>
     <value type="QString">HOME=/home/sertac</value>
     <value type="QString">LANG=tr_TR.utf8</value>
@@ -94,17 +94,17 @@
     <value type="QString">PATH=/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
     <value type="QString">PWD=/home/sertac</value>
     <value type="QString">QTDIR=/usr/share/qt4</value>
-    <value type="QString">SESSION_MANAGER=local/sertac-laptop:@/tmp/.ICE-unix/14360,unix/sertac-laptop:/tmp/.ICE-unix/14360</value>
+    <value type="QString">SESSION_MANAGER=local/sertac-laptop:@/tmp/.ICE-unix/2091,unix/sertac-laptop:/tmp/.ICE-unix/2091</value>
     <value type="QString">SHELL=/bin/bash</value>
     <value type="QString">SPEECHD_PORT=7560</value>
-    <value type="QString">SSH_AGENT_PID=14394</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-26H3Wv/ssh</value>
+    <value type="QString">SSH_AGENT_PID=2125</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-65YQM2/ssh</value>
     <value type="QString">USER=sertac</value>
     <value type="QString">USERNAME=sertac</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-sertac-RltRDa/database</value>
+    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-sertac-NgWxsb/database</value>
     <value type="QString">XDG_CONFIG_DIRS=/etc/xdg/xdg-gnome:/etc/xdg</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=b9c7bd6d24a08aec96107fee4bc9d8bf-1272323434.419901-1687504689</value>
+    <value type="QString">XDG_SESSION_COOKIE=b9c7bd6d24a08aec96107fee4bc9d8bf-1272362295.875446-168437471</value>
    </valuelist>
    <valuelist key="abstractProcess.arguments" type="QVariantList">
     <value type="QString">/media/Disk/Documents/Projects/lib-qrtm/libqrtm.pro</value>
@@ -123,7 +123,7 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-AFMNHMe8bT,guid=e58b2134288f0050331b271e4bd61d6a</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-Bc3vx1nBSR,guid=ace265216bdc324522e6f6144bd6b538</value>
     <value type="QString">DEFAULTS_PATH=/usr/share/gconf/gnome.default.path</value>
     <value type="QString">DESKTOP_SESSION=gnome</value>
     <value type="QString">DISPLAY=:0.0</value>
@@ -131,8 +131,8 @@
     <value type="QString">GDM_KEYBOARD_LAYOUT=us</value>
     <value type="QString">GDM_LANG=tr_TR.utf8</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-26H3Wv</value>
-    <value type="QString">GNOME_KEYRING_PID=14342</value>
+    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-65YQM2</value>
+    <value type="QString">GNOME_KEYRING_PID=2073</value>
     <value type="QString">GTK_MODULES=canberra-gtk-module</value>
     <value type="QString">HOME=/home/sertac</value>
     <value type="QString">LANG=tr_TR.utf8</value>
@@ -144,17 +144,17 @@
     <value type="QString">PATH=/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
     <value type="QString">PWD=/home/sertac</value>
     <value type="QString">QTDIR=/usr/share/qt4</value>
-    <value type="QString">SESSION_MANAGER=local/sertac-laptop:@/tmp/.ICE-unix/14360,unix/sertac-laptop:/tmp/.ICE-unix/14360</value>
+    <value type="QString">SESSION_MANAGER=local/sertac-laptop:@/tmp/.ICE-unix/2091,unix/sertac-laptop:/tmp/.ICE-unix/2091</value>
     <value type="QString">SHELL=/bin/bash</value>
     <value type="QString">SPEECHD_PORT=7560</value>
-    <value type="QString">SSH_AGENT_PID=14394</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-26H3Wv/ssh</value>
+    <value type="QString">SSH_AGENT_PID=2125</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-65YQM2/ssh</value>
     <value type="QString">USER=sertac</value>
     <value type="QString">USERNAME=sertac</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-sertac-RltRDa/database</value>
+    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-sertac-NgWxsb/database</value>
     <value type="QString">XDG_CONFIG_DIRS=/etc/xdg/xdg-gnome:/etc/xdg</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=b9c7bd6d24a08aec96107fee4bc9d8bf-1272323434.419901-1687504689</value>
+    <value type="QString">XDG_SESSION_COOKIE=b9c7bd6d24a08aec96107fee4bc9d8bf-1272362295.875446-168437471</value>
    </valuelist>
    <value key="abstractProcess.IgnoreReturnValue" type="bool">false</value>
    <valuelist key="abstractProcess.arguments" type="QVariantList">
@@ -170,7 +170,7 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-AFMNHMe8bT,guid=e58b2134288f0050331b271e4bd61d6a</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-Bc3vx1nBSR,guid=ace265216bdc324522e6f6144bd6b538</value>
     <value type="QString">DEFAULTS_PATH=/usr/share/gconf/gnome.default.path</value>
     <value type="QString">DESKTOP_SESSION=gnome</value>
     <value type="QString">DISPLAY=:0.0</value>
@@ -178,8 +178,8 @@
     <value type="QString">GDM_KEYBOARD_LAYOUT=us</value>
     <value type="QString">GDM_LANG=tr_TR.utf8</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-26H3Wv</value>
-    <value type="QString">GNOME_KEYRING_PID=14342</value>
+    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-65YQM2</value>
+    <value type="QString">GNOME_KEYRING_PID=2073</value>
     <value type="QString">GTK_MODULES=canberra-gtk-module</value>
     <value type="QString">HOME=/home/sertac</value>
     <value type="QString">LANG=tr_TR.utf8</value>
@@ -191,17 +191,17 @@
     <value type="QString">PATH=/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
     <value type="QString">PWD=/home/sertac</value>
     <value type="QString">QTDIR=/usr/share/qt4</value>
-    <value type="QString">SESSION_MANAGER=local/sertac-laptop:@/tmp/.ICE-unix/14360,unix/sertac-laptop:/tmp/.ICE-unix/14360</value>
+    <value type="QString">SESSION_MANAGER=local/sertac-laptop:@/tmp/.ICE-unix/2091,unix/sertac-laptop:/tmp/.ICE-unix/2091</value>
     <value type="QString">SHELL=/bin/bash</value>
     <value type="QString">SPEECHD_PORT=7560</value>
-    <value type="QString">SSH_AGENT_PID=14394</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-26H3Wv/ssh</value>
+    <value type="QString">SSH_AGENT_PID=2125</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-65YQM2/ssh</value>
     <value type="QString">USER=sertac</value>
     <value type="QString">USERNAME=sertac</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-sertac-RltRDa/database</value>
+    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-sertac-NgWxsb/database</value>
     <value type="QString">XDG_CONFIG_DIRS=/etc/xdg/xdg-gnome:/etc/xdg</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=b9c7bd6d24a08aec96107fee4bc9d8bf-1272323434.419901-1687504689</value>
+    <value type="QString">XDG_SESSION_COOKIE=b9c7bd6d24a08aec96107fee4bc9d8bf-1272362295.875446-168437471</value>
    </valuelist>
    <value key="abstractProcess.IgnoreReturnValue" type="bool">true</value>
    <valuelist key="abstractProcess.arguments" type="QVariantList">

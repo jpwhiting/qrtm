@@ -17,8 +17,6 @@ SOURCES += src/loginview.cpp \
     src/libqjson/json_parser.cc \
     src/authentication.cpp \
     src/main.cpp \
-    src/merih_deneme.cpp \
-    src/exception.cpp \
     src/service.cpp
 HEADERS += src/libqrtm_global.h \
     src/loginview.h \
@@ -38,7 +36,6 @@ HEADERS += src/libqrtm_global.h \
     src/libqjson/json_scanner.h \
     src/libqjson/json_parser.hh \
     src/authentication.h \
-    src/exception.h \
     src/service.h
 win32:DESTDIR = .\build\win32
 unix:DESTDIR = ./build/unix

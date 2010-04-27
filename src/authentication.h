@@ -21,7 +21,6 @@
 
 #include "rtm.h"
 #include "request.h"
-#include "exception.h"
 
 class QString;
 
@@ -47,16 +46,16 @@ namespace RTM
 
     signals:
         void authFinished(QVariantMap auth);
-	void authError(RTM::Exception ex);
+	void authError(QVariantMap response, RTM::ResponseStatus status);
 
     public slots:
         void beginAuth();
 
     protected slots:
-        void frobReceived(QVariantMap response);
+	void frobReceived(QVariantMap response, RTM::ResponseStatus status);
         void login();
         void requestToken();
-        void tokenReceived(QVariantMap response);
+	void tokenReceived(QVariantMap response, RTM::ResponseStatus status);
 
     protected:
 	QString apiKey;

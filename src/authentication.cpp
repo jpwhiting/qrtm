@@ -29,7 +29,6 @@
 RTM::Authentication::Authentication(QString key, QString sharedSecret, RTM::Permission perms, QString token, QObject *parent) :
 	RTM::Request(sharedSecret, RTM::baseAuthUrl, RTM::Signed, parent), apiKey(key), token(token), permission(perms)
 {
-    connect(this, SIGNAL(requestError(RTM::Exception)), this, SIGNAL(authError(RTM::Exception)));
 }
 
 inline void RTM::Authentication::setApiKey(QString key)
@@ -76,9 +75,7 @@ void RTM::Authentication::beginAuth()
     if(frob.isEmpty()) {
         qDebug() << "Frob empty, new frob requested\n";
         frobRequest = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
-        connect(frobRequest, SIGNAL(requestFinished(QVariantMap)), this, SLOT(frobReceived(QVariantMap)));
-	connect(frobRequest, SIGNAL(requestError(RTM::Exception)), this, SIGNAL(authError(RTM::Exception)));
-
+	connect(frobRequest, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SLOT(frobReceived(QVariantMap, RTM::ResponseStatus)));
         frobRequest->addArgument("api_key", apiKey);
         frobRequest->addArgument("method", "rtm.auth.getFrob");
         frobRequest->sendRequest();
@@ -88,11 +85,16 @@ void RTM::Authentication::beginAuth()
     }
 }
 
-void RTM::Authentication::frobReceived(QVariantMap response)
+void RTM::Authentication::frobReceived(QVariantMap response, RTM::ResponseStatus status)
 {
-    frob = response["frob"].toString();
-    qDebug() << "Frob: " << frob << " received\n";
-    login();
+    if(status == RTM::OK) {
+	frob = response["frob"].toString();
+	qDebug() << "Frob: " << frob << " received\n";
+	login();
+    }
+    else {
+	emit authError(response, status);
+    }
 }
 
 void RTM::Authentication::login()
@@ -130,20 +132,22 @@ void RTM::Authentication::requestToken()
     qDebug() << "Authorization completed get token\n";
 
     tokenRequest = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
-    connect(tokenRequest, SIGNAL(requestFinished(QVariantMap)), this, SLOT(tokenReceived(QVariantMap)));
-    connect(tokenRequest, SIGNAL(requestError(RTM::Exception)), this, SIGNAL(authError(RTM::Exception)));
-
+    connect(tokenRequest, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SLOT(tokenReceived(QVariantMap, RTM::ResponseStatus)));
     tokenRequest->addArgument("api_key", apiKey);
     tokenRequest->addArgument("frob", frob);
     tokenRequest->addArgument("method", "rtm.auth.getToken");
     tokenRequest->sendRequest();
 }
 
-void RTM::Authentication::tokenReceived(QVariantMap response)
+void RTM::Authentication::tokenReceived(QVariantMap response, RTM::ResponseStatus status)
 {
-    token = (response["auth"].toMap())["token"].toString();
-    qDebug() << "Token: " << token << " received\n";
-    emit authFinished(response["auth"].toMap());
+    if(status == RTM::OK) {
+	token = (response["auth"].toMap())["token"].toString();
+	qDebug() << "Token: " << token << " received\n";
+	emit authFinished(response["auth"].toMap());
+    }
+    else
+	emit authError(response, status);
 }
 
 QString RTM::Authentication::getPermission(RTM::Permission p)
