@@ -68,13 +68,15 @@ void RTM::Request::signRequest()
     QString rawSign = sharedSecret;
     QMapIterator<QString, QString> it(arguments);
 
-    while(it.hasNext()) {
-	it.next();
-	rawSign.append(it.key());
-	rawSign.append(it.value());
-    }
+    if(arguments.find("api_sig") == arguments.end()) {
+	while(it.hasNext()) {
+	    it.next();
+	    rawSign.append(it.key());
+	    rawSign.append(it.value());
+	}
 
-    arguments.insert("api_sig", QString(QCryptographicHash::hash(rawSign.toAscii(), QCryptographicHash::Md5).toHex()));
+	arguments.insert("api_sig", QString(QCryptographicHash::hash(rawSign.toAscii(), QCryptographicHash::Md5).toHex()));
+    }
 }
 
 void RTM::Request::unsignRequest()
