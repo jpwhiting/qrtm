@@ -42,7 +42,9 @@ namespace RTM
     public:
 	Request(QString secret, QString baseURL = RTM::baseMethodUrl, RTM::MethodType rType = RTM::Signed, QObject *parent = 0);
 	void addArgument(QString key, QString value);
-        void clearArguments();
+	void clearArguments();
+	void setSecret(QString secret);
+	void setType(RTM::MethodType t);
     protected:
 	QUrl prepareUrl();
 	void signRequest();

@@ -40,6 +40,16 @@ void RTM::Request::clearArguments()
     arguments.clear();
 }
 
+void RTM::Request::setSecret(QString secret)
+{
+    sharedSecret = secret;
+}
+
+void RTM::Request::setType(RTM::MethodType t)
+{
+    type = t;
+}
+
 QUrl RTM::Request::prepareUrl()
 {
     arguments.insert("format", "json");
