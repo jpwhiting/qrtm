@@ -111,7 +111,7 @@ void RTM::Authentication::login()
     addArgument("frob", frob);
 
     loginPage->setUrl(prepareUrl());
-    qDebug() << "Login URL:" << loginPage->url() << "\n";
+    qDebug() << "Login URL:" << loginPage->url().toString() << "\n";
     loginPage->resize(800, 600);
     loginPage->scroll(0, 200);
 
