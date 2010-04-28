@@ -17,7 +17,7 @@
  */
 
 #include "service.h"
-#include <QApplication>
+
 RTM::Service::Service(QString key, QString secret, RTM::Permission perms, QString token, QObject *parent) :
     QObject(parent), authentication(key, secret, perms, token, this), apiKey(key), sharedSecret(secret)
 {
