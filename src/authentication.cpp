@@ -20,7 +20,6 @@
 #include <QtCore/QDebug>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
 #include <QtGui/QWidget>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>

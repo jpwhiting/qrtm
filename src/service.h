@@ -21,9 +21,7 @@
 
 #include "rtm.h"
 #include "authentication.h"
-#include "libqjson/parser.h"
 #include <QObject>
-#include <QtCore/QTime>
 
 namespace RTM {
 
@@ -144,9 +142,6 @@ namespace RTM {
         QString apiKey;
         QString sharedSecret;
         QString token;
-        QTime lastAttempt;
-        QJson::Parser jsonParser;
-
     };
 }
 

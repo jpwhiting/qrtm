@@ -19,10 +19,12 @@
 #include "request.h"
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDebug>
+#include <QtCore/QMap>
 #include <QtCore/QMapIterator>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
+
 
 RTM::Request::Request(QString secret, QString baseURL, RTM::MethodType rType, QObject *parent) :
     QObject(parent), baseUrl(baseURL), sharedSecret(secret), accessManager(new QNetworkAccessManager(this)), type(rType)

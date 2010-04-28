@@ -26,7 +26,7 @@ LoginView::LoginView(QWidget * parent) : QWebView(parent)
 bool LoginView::event(QEvent *event)
 {
     if(event->type() == QEvent::Close)
-        {
+    {
         emit windowClosed(true);
         return QWebView::event(event);
     }

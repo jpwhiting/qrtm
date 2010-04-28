@@ -22,8 +22,6 @@
 #include "rtm.h"
 #include "request.h"
 
-class QString;
-
 namespace RTM
 {
     class RTMAPISHARED_EXPORT Authentication : public RTM::Request

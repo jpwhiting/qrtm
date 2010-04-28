@@ -21,8 +21,6 @@
 
 #include "libqrtm_global.h"
 #include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
 #include "libqjson/parser.h"
 
 namespace RTM
@@ -33,7 +31,6 @@ namespace RTM
 
     const QString baseMethodUrl = "http://api.rememberthemilk.com/services/rest/?";
     const QString baseAuthUrl = "http://www.rememberthemilk.com/services/auth/?";
-
 
     const QString AUTH_CHECK_TOKEN = "rtm.auth.checkToken";
     const QString CONTACTS_ADD = "rtm.contacts.add";

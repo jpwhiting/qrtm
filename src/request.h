@@ -20,17 +20,15 @@
 #define REQUEST_H
 
 #include "rtm.h"
-
-#include <QtCore/QMap>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QUrl>
-#include <QtCore/QVariantMap>
 #include "libqjson/parser.h"
 
+#include <QtCore/QObject>
+#include <QtCore/QUrl>
+#include <QtCore/QVariantMap>
 
 class QNetworkAccessManager;
 class QNetworkReply;
+template <class x, class y> class QMap;
 
 namespace RTM
 {
