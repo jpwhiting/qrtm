@@ -16,7 +16,6 @@ SOURCES += src/loginview.cpp \
     src/libqjson/json_scanner.cpp \
     src/libqjson/json_parser.cc \
     src/authentication.cpp \
-    src/main.cpp \
     src/service.cpp
 HEADERS += src/libqrtm_global.h \
     src/loginview.h \
@@ -38,14 +37,13 @@ HEADERS += src/libqrtm_global.h \
     src/authentication.h \
     src/service.h
 OTHER_FILES += src/libqjson/json_parser.yy
-
-win32 {
-DESTDIR = .\build\win32
-MOC_DIR = .\build\objects
-OBJECTS_DIR = .\build\objects
+win32 { 
+    DESTDIR = .\build\win32
+    MOC_DIR = .\build\objects
+    OBJECTS_DIR = .\build\objects
 }
-unix {
-DESTDIR = ./build/unix
-MOC_DIR = ./build/objects
-OBJECTS_DIR = ./build/objects
+unix { 
+    DESTDIR = ./build/unix
+    MOC_DIR = ./build/objects
+    OBJECTS_DIR = ./build/objects
 }
