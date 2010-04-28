@@ -79,6 +79,7 @@ namespace RTM
     const QString TIMELINES_CREATE = "rtm.timelines.create";
     const QString TIMEZONES_GET_LIST = "rtm.timezones.getList";
     const QString TRANSACTIONS_UNDO = "rtm.transactions.undo";
+    const QString TEST_LOGIN = "rtm.test.login";
 }
 
 #endif // H
