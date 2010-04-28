@@ -116,7 +116,7 @@ void RTM::Request::responseReceived(QNetworkReply * reply)
     qDebug() << "Resp rec: " << QString(response);
 
     if(reply)
-    delete reply;
+        delete reply;
 
     result = (jsonParser.parse(response, &ok).toMap())["rsp"].toMap();
 
