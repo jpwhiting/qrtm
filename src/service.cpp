@@ -18,14 +18,25 @@
 
 #include "service.h"
 
-RTM::Service::Service(QString key, QString secret, RTM::Permission perms, QString token, QObject *parent) :
-    QObject(parent), authentication(key, secret, perms, token, this), apiKey(key), sharedSecret(secret)
+RTM::Service::Service(QString key, QString secret, QObject *parent) :
+        QObject(parent), authentication(key, secret, RTM::Read, "", this), apiKey(key), sharedSecret(secret)
 {
 
 }
 
-void RTM::Service::authenticate()
+void RTM::Service::setToken(QString tok)
 {
+    token = tok;
+}
+
+RTM::Permission RTM::Service::getPermission()
+{
+    return authentication.getPermission();
+}
+
+void RTM::Service::authenticate(RTM::Permission p)
+{
+    authentication.setPermission(p);
     connect(&authentication, SIGNAL(authFinished(QVariantMap)), this, SIGNAL(authenticationSuccessful(QVariantMap)));
     connect(&authentication, SIGNAL(authError(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(authenticationFailed(QVariantMap,RTM::ResponseStatus)));
     authentication.beginAuth();

@@ -30,8 +30,9 @@ namespace RTM {
         Q_OBJECT
 
     public:
-        Service(QString key, QString secret, RTM::Permission perms, QString token = "", QObject *parent = 0);
-
+        Service(QString key, QString secret, QObject *parent = 0);
+        void setToken(QString tok);
+        RTM::Permission getPermission();
     protected:
 
     signals:
@@ -85,7 +86,7 @@ namespace RTM {
         void testLoginFinished(QVariantMap response, RTM::ResponseStatus status);
 
     public slots:
-        void authenticate();
+        void authenticate(RTM::Permission p);
         void authCheckToken(QString token);
         void authGetToken();
         void contactsAdd(QString timeline, QString contact);
