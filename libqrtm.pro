@@ -37,8 +37,15 @@ HEADERS += src/libqrtm_global.h \
     src/libqjson/json_parser.hh \
     src/authentication.h \
     src/service.h
-win32:DESTDIR = .\build\win32
-unix:DESTDIR = ./build/unix
 OTHER_FILES += src/libqjson/json_parser.yy
-MOC_DIR = DESTDIR
-OBJECTS_DIR = DESTDIR
+
+win32 {
+DESTDIR = .\build\win32
+MOC_DIR = .\build\objects
+OBJECTS_DIR = .\build\objects
+}
+unix {
+DESTDIR = ./build/unix
+MOC_DIR = ./build/objects
+OBJECTS_DIR = ./build/objects
+}
