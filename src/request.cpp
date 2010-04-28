@@ -64,11 +64,11 @@ QUrl RTM::Request::prepareUrl()
     QMapIterator<QString, QString> it(arguments);
 
     while(it.hasNext()) {
-	it.next();
-	url.append(it.key());
-	url.append("=");
-	url.append(it.value());
-	url.append("&");
+        it.next();
+        url.append(it.key());
+        url.append("=");
+        url.append(it.value());
+        url.append("&");
     }
     return QUrl(url);
 }
@@ -79,13 +79,13 @@ void RTM::Request::signRequest()
     QMapIterator<QString, QString> it(arguments);
 
     if(arguments.find("api_sig") == arguments.end()) {
-	while(it.hasNext()) {
-	    it.next();
-	    rawSign.append(it.key());
-	    rawSign.append(it.value());
-	}
+        while(it.hasNext()) {
+            it.next();
+            rawSign.append(it.key());
+            rawSign.append(it.value());
+        }
 
-	arguments.insert("api_sig", QString(QCryptographicHash::hash(rawSign.toAscii(), QCryptographicHash::Md5).toHex()));
+        arguments.insert("api_sig", QString(QCryptographicHash::hash(rawSign.toAscii(), QCryptographicHash::Md5).toHex()));
     }
 }
 
@@ -116,7 +116,7 @@ void RTM::Request::responseReceived(QNetworkReply * reply)
     qDebug() << "Resp rec: " << QString(response);
 
     if(reply)
-	delete reply;
+    delete reply;
 
     result = (jsonParser.parse(response, &ok).toMap())["rsp"].toMap();
 
@@ -124,13 +124,13 @@ void RTM::Request::responseReceived(QNetworkReply * reply)
         QString status = result["stat"].toString();
 
         if(status == "ok") {
-	    emit requestFinished(result, RTM::OK);
+            emit requestFinished(result, RTM::OK);
         }
         else {
-	    emit requestFinished(result, RTM::Fail);
+            emit requestFinished(result, RTM::Fail);
         }
     }
     else {
-	emit requestFinished(result, RTM::Malformed);
+        emit requestFinished(result, RTM::Malformed);
     }
 }

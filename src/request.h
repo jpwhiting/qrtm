@@ -36,35 +36,35 @@ namespace RTM
 {
     class RTMAPISHARED_EXPORT Request : public QObject
     {
-	Q_OBJECT
+        Q_OBJECT
 
     public:
-	Request(QString secret, QString baseURL = RTM::baseMethodUrl, RTM::MethodType rType = RTM::Signed, QObject *parent = 0);
-	void addArgument(QString key, QString value);
-	void clearArguments();
-	void setSecret(QString secret);
-	void setType(RTM::MethodType t);
+        Request(QString secret, QString baseURL = RTM::baseMethodUrl, RTM::MethodType rType = RTM::Signed, QObject *parent = 0);
+        void addArgument(QString key, QString value);
+        void clearArguments();
+        void setSecret(QString secret);
+        void setType(RTM::MethodType t);
     protected:
-	QUrl prepareUrl();
-	void signRequest();
-	void unsignRequest();
+        QUrl prepareUrl();
+        void signRequest();
+        void unsignRequest();
 
     signals:
-	void requestFinished(QVariantMap response, RTM::ResponseStatus status);
+        void requestFinished(QVariantMap response, RTM::ResponseStatus status);
 
     public slots:
         void sendRequest();
         QString sendSyncRequest(QUrl url);
 
     protected slots:
-	void responseReceived(QNetworkReply * reply);
+        void responseReceived(QNetworkReply * reply);
 
     protected:
-	QMap<QString, QString> arguments;
+        QMap<QString, QString> arguments;
         QString baseUrl;
-	QString sharedSecret;
-	QNetworkAccessManager * accessManager;
-	RTM::MethodType type;
+        QString sharedSecret;
+        QNetworkAccessManager * accessManager;
+        RTM::MethodType type;
         QJson::Parser jsonParser;
     };
 }

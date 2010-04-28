@@ -19,7 +19,7 @@
 #include "service.h"
 #include <QApplication>
 RTM::Service::Service(QString key, QString secret, RTM::Permission perms, QString token, QObject *parent) :
-	QObject(parent), authentication(key, secret, perms, token, this), apiKey(key), sharedSecret(secret)
+    QObject(parent), authentication(key, secret, perms, token, this), apiKey(key), sharedSecret(secret)
 {
 
 }
@@ -37,9 +37,9 @@ void RTM::Service::authCheckToken(QString tok)
 void RTM::Service::authGetToken()
 {
     if(authentication.getToken().isEmpty())
-	emit authGetTokenFinished("", RTM::Fail);
+        emit authGetTokenFinished("", RTM::Fail);
     else
-	emit authGetTokenFinished(authentication.getToken(), RTM::OK);
+        emit authGetTokenFinished(authentication.getToken(), RTM::OK);
 }
 
 void RTM::Service::contactsAdd(QString timeline, QString contact)
@@ -146,7 +146,7 @@ void RTM::Service::listsAdd(QString timeline, QString listName, QString filter)
     request->addArgument("timeline", timeline);
     request->addArgument("name", listName);
     if(!filter.isEmpty())
-	request->addArgument("filter", filter);
+    request->addArgument("filter", filter);
     request->sendRequest();
 }
 
@@ -252,7 +252,7 @@ void RTM::Service::tasksAdd(QString timeline, QString taskName, QString listID)
     request->addArgument("name", taskName);
     request->addArgument("parse", "0");
     if(!listID.isEmpty())
-	request->addArgument("list_id", listID);
+        request->addArgument("list_id", listID);
     request->sendRequest();
 }
 
@@ -267,7 +267,7 @@ void RTM::Service::tasksSmartAdd(QString timeline, QString taskName, QString lis
     request->addArgument("name", taskName);
     request->addArgument("parse", "1");
     if(!listID.isEmpty())
-	request->addArgument("list_id", listID);
+        request->addArgument("list_id", listID);
     request->sendRequest();
 }
 
@@ -322,11 +322,11 @@ void RTM::Service::tasksGetList(QMap<QString, QString> args)
     request->addArgument("auth_token", token);
     request->addArgument("method", RTM::TASKS_GET_LIST);
     if(args.contains("list_id"))
-	request->addArgument("list_id", args.value("list_id"));
+    request->addArgument("list_id", args.value("list_id"));
     if(args.contains("filter"))
-	request->addArgument("filter", args.value("filter"));
+        request->addArgument("filter", args.value("filter"));
     if(args.contains("last_sync"))
-	request->addArgument("last_sync", args.value("last_sync"));
+        request->addArgument("last_sync", args.value("last_sync"));
     request->sendRequest();
 }
 
@@ -401,11 +401,11 @@ void RTM::Service::tasksSetDueDate(QString timeline, QString listID, QString tas
     request->addArgument("taskseries_id", taskSeriesID);
     request->addArgument("task_id", taskID);
     if(optArgs.contains("due"))
-	request->addArgument("due", optArgs.value("due"));
+        request->addArgument("due", optArgs.value("due"));
     if(optArgs.contains("has_due_time"))
-	request->addArgument("has_due_time", optArgs.value("has_due_time"));
+        request->addArgument("has_due_time", optArgs.value("has_due_time"));
     if(optArgs.contains("parse"))
-	request->addArgument("parse", optArgs.value("parse"));
+        request->addArgument("parse", optArgs.value("parse"));
     request->sendRequest();
 }
 
@@ -421,7 +421,7 @@ void RTM::Service::tasksSetEstimate(QString timeline, QString listID, QString ta
     request->addArgument("taskseries_id", taskSeriesID);
     request->addArgument("task_id", taskID);
     if(!estimate.isEmpty())
-	request->addArgument("estimate", estimate);
+        request->addArgument("estimate", estimate);
     request->sendRequest();
 }
 
@@ -437,7 +437,7 @@ void RTM::Service::tasksSetLocation(QString timeline, QString listID, QString ta
     request->addArgument("taskseries_id", taskSeriesID);
     request->addArgument("task_id", taskID);
     if(!location.isEmpty())
-	request->addArgument("location", location);
+        request->addArgument("location", location);
     request->sendRequest();
 }
 
@@ -468,7 +468,7 @@ void RTM::Service::tasksSetPriority(QString timeline, QString listID, QString ta
     request->addArgument("taskseries_id", taskSeriesID);
     request->addArgument("task_id", taskID);
     if(!priority.isEmpty())
-	request->addArgument("priority", priority);
+        request->addArgument("priority", priority);
     request->sendRequest();
 }
 
@@ -484,7 +484,7 @@ void RTM::Service::tasksSetRecurrence(QString timeline, QString listID, QString 
     request->addArgument("taskseries_id", taskSeriesID);
     request->addArgument("task_id", taskID);
     if(!repeat.isEmpty())
-	request->addArgument("repeat", repeat);
+        request->addArgument("repeat", repeat);
     request->sendRequest();
 }
 
@@ -500,7 +500,7 @@ void RTM::Service::tasksSetTags(QString timeline, QString listID, QString taskSe
     request->addArgument("taskseries_id", taskSeriesID);
     request->addArgument("task_id", taskID);
     if(!tags.isEmpty())
-	request->addArgument("tags", tags);
+        request->addArgument("tags", tags);
     request->sendRequest();
 }
 
@@ -516,7 +516,7 @@ void RTM::Service::tasksSetUrl(QString timeline, QString listID, QString taskSer
     request->addArgument("taskseries_id", taskSeriesID);
     request->addArgument("task_id", taskID);
     if(!url.isEmpty())
-	request->addArgument("url", url);
+        request->addArgument("url", url);
     request->sendRequest();
 }
 
@@ -590,9 +590,9 @@ void RTM::Service::timeConvert(QString toTimezone, QMap<QString, QString> optArg
     request->addArgument("method", RTM::TIME_CONVERT);
     request->addArgument("to_timezone", toTimezone);
     if(optArgs.contains("from_timezone"))
-	request->addArgument("from_timezone", optArgs.value("from_timezone"));
+        request->addArgument("from_timezone", optArgs.value("from_timezone"));
     if(optArgs.contains("time"))
-	request->addArgument("time", optArgs.value("time"));
+        request->addArgument("time", optArgs.value("time"));
     request->sendRequest();
 }
 
@@ -605,9 +605,9 @@ void RTM::Service::timeParse(QString text, QMap<QString, QString> optArgs)
     request->addArgument("method", RTM::TIME_PARSE);
     request->addArgument("text", text);
     if(optArgs.contains("timezone"))
-	request->addArgument("timezone", optArgs.value("timezone"));
+        request->addArgument("timezone", optArgs.value("timezone"));
     if(optArgs.contains("dateformat"))
-	request->addArgument("dateformat", optArgs.value("dateformat"));
+        request->addArgument("dateformat", optArgs.value("dateformat"));
     request->sendRequest();
 }
 

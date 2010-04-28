@@ -31,37 +31,37 @@ namespace RTM
         Q_OBJECT
 
     public:
-	Authentication(QString key, QString secret, RTM::Permission perms, QString token = "", QObject *parent = 0);
-	void setApiKey(QString key);
-	void setSharedSecret(QString secret);
-	void setPermission(RTM::Permission perm);
-	void setToken(QString tok);
-	QString getApiKey();
-	QString getSharedSecret();
-	RTM::Permission getPermission();
-	QString getToken();
+        Authentication(QString key, QString secret, RTM::Permission perms, QString token = "", QObject *parent = 0);
+        void setApiKey(QString key);
+        void setSharedSecret(QString secret);
+        void setPermission(RTM::Permission perm);
+        void setToken(QString tok);
+        QString getApiKey();
+        QString getSharedSecret();
+        RTM::Permission getPermission();
+        QString getToken();
 
     protected:
         QString getPermission(RTM::Permission p);
 
     signals:
         void authFinished(QVariantMap auth);
-	void authError(QVariantMap response, RTM::ResponseStatus status);
+        void authError(QVariantMap response, RTM::ResponseStatus status);
 
     public slots:
         void beginAuth();
 
     protected slots:
-	void frobReceived(QVariantMap response, RTM::ResponseStatus status);
+        void frobReceived(QVariantMap response, RTM::ResponseStatus status);
         void login();
         void requestToken();
-	void tokenReceived(QVariantMap response, RTM::ResponseStatus status);
+        void tokenReceived(QVariantMap response, RTM::ResponseStatus status);
 
     protected:
-	QString apiKey;
-	QString frob;
-	QString token;
-	RTM::Permission permission;
+        QString apiKey;
+        QString frob;
+        QString token;
+        RTM::Permission permission;
         RTM::Request * frobRequest;
         RTM::Request * tokenRequest;
     };
