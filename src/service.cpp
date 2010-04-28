@@ -24,6 +24,13 @@ RTM::Service::Service(QString key, QString secret, RTM::Permission perms, QStrin
 
 }
 
+void RTM::Service::authenticate()
+{
+    connect(&authentication, SIGNAL(authFinished(QVariantMap)), this, SIGNAL(authenticationSuccessful(QVariantMap)));
+    connect(&authentication, SIGNAL(authError(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(authenticationFailed(QVariantMap,RTM::ResponseStatus)));
+    authentication.beginAuth();
+}
+
 void RTM::Service::authCheckToken(QString tok)
 {
     RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Unsigned, this);

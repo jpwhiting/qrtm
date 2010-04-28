@@ -35,6 +35,8 @@ namespace RTM {
     protected:
 
     signals:
+        void authenticationSuccessful(QVariantMap response);
+        void authenticationFailed(QVariantMap response, RTM::ResponseStatus status);
         void authCheckTokenFinished(QVariantMap response, RTM::ResponseStatus status);
         void authGetTokenFinished(QString token, RTM::ResponseStatus status);
         void contactsAddFinished(QVariantMap response, RTM::ResponseStatus status);
@@ -83,6 +85,7 @@ namespace RTM {
         void testLoginFinished(QVariantMap response, RTM::ResponseStatus status);
 
     public slots:
+        void authenticate();
         void authCheckToken(QString token);
         void authGetToken();
         void contactsAdd(QString timeline, QString contact);
