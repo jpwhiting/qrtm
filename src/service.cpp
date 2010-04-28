@@ -146,7 +146,7 @@ void RTM::Service::listsAdd(QString timeline, QString listName, QString filter)
     request->addArgument("timeline", timeline);
     request->addArgument("name", listName);
     if(!filter.isEmpty())
-    request->addArgument("filter", filter);
+        request->addArgument("filter", filter);
     request->sendRequest();
 }
 
@@ -192,7 +192,8 @@ void RTM::Service::listsSetDefaultList(QString timeline, QString listID)
     request->addArgument("auth_token", token);
     request->addArgument("method", RTM::LISTS_SET_DEFAULT_LIST);
     request->addArgument("timeline", timeline);
-    request->addArgument("list_id", listID);
+    if(!listID.isEmpty())
+        request->addArgument("list_id", listID);
     request->sendRequest();
 }
 
@@ -259,7 +260,7 @@ void RTM::Service::tasksAdd(QString timeline, QString taskName, QString listID)
 void RTM::Service::tasksSmartAdd(QString timeline, QString taskName, QString listID)
 {
     RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSmartAddFinished(QVariantMap,RTM::ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksAddFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", apiKey);
     request->addArgument("auth_token", token);
     request->addArgument("method", RTM::TASKS_ADD);
@@ -311,6 +312,16 @@ void RTM::Service::tasksDelete(QString timeline, QString listID, QString taskSer
     request->addArgument("list_id", listID);
     request->addArgument("taskseries_id", taskSeriesID);
     request->addArgument("task_id", taskID);
+    request->sendRequest();
+}
+
+void RTM::Service::tasksGetList()
+{
+    RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksGetListFinished(QVariantMap,RTM::ResponseStatus)));
+    request->addArgument("api_key", apiKey);
+    request->addArgument("auth_token", token);
+    request->addArgument("method", RTM::TASKS_GET_LIST);
     request->sendRequest();
 }
 
@@ -389,6 +400,20 @@ void RTM::Service::tasksRemoveTags(QString timeline, QString listID, QString tas
     request->sendRequest();
 }
 
+void RTM::Service::tasksSetDueDate(QString timeline, QString listID, QString taskSeriesID, QString taskID)
+{
+    RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetDueDateFinished(QVariantMap,RTM::ResponseStatus)));
+    request->addArgument("api_key", apiKey);
+    request->addArgument("auth_token", token);
+    request->addArgument("method", RTM::TASKS_SET_DUE_DATE);
+    request->addArgument("timeline", timeline);
+    request->addArgument("list_id", listID);
+    request->addArgument("taskseries_id", taskSeriesID);
+    request->addArgument("task_id", taskID);
+    request->sendRequest();
+}
+
 void RTM::Service::tasksSetDueDate(QString timeline, QString listID, QString taskSeriesID, QString taskID, QMap<QString, QString>optArgs)
 {
     RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
@@ -425,7 +450,7 @@ void RTM::Service::tasksSetEstimate(QString timeline, QString listID, QString ta
     request->sendRequest();
 }
 
-void RTM::Service::tasksSetLocation(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString location)
+void RTM::Service::tasksSetLocation(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString locationID)
 {
     RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
     connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetLocationFinished(QVariantMap,RTM::ResponseStatus)));
@@ -436,8 +461,8 @@ void RTM::Service::tasksSetLocation(QString timeline, QString listID, QString ta
     request->addArgument("list_id", listID);
     request->addArgument("taskseries_id", taskSeriesID);
     request->addArgument("task_id", taskID);
-    if(!location.isEmpty())
-        request->addArgument("location", location);
+    if(!locationID.isEmpty())
+        request->addArgument("location_id", locationID);
     request->sendRequest();
 }
 
@@ -550,7 +575,7 @@ void RTM::Service::tasksNotesAdd(QString timeline, QString listID, QString taskS
     request->sendRequest();
 }
 
-void RTM::Service::tasksNotesDelete(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString noteID)
+void RTM::Service::tasksNotesDelete(QString timeline, QString noteID)
 {
     RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
     connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksNotesDeleteFinished(QVariantMap,RTM::ResponseStatus)));
@@ -558,14 +583,11 @@ void RTM::Service::tasksNotesDelete(QString timeline, QString listID, QString ta
     request->addArgument("auth_token", token);
     request->addArgument("method", RTM::TASKS_NOTES_DELETE);
     request->addArgument("timeline", timeline);
-    request->addArgument("list_id", listID);
-    request->addArgument("taskseries_id", taskSeriesID);
-    request->addArgument("task_id", taskID);
     request->addArgument("note_id", noteID);
     request->sendRequest();
 }
 
-void RTM::Service::tasksNotesEdit(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString noteTitle, QString noteText)
+void RTM::Service::tasksNotesEdit(QString timeline, QString noteID, QString noteTitle, QString noteText)
 {
     RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
     connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksNotesEditFinished(QVariantMap,RTM::ResponseStatus)));
@@ -573,11 +595,20 @@ void RTM::Service::tasksNotesEdit(QString timeline, QString listID, QString task
     request->addArgument("auth_token", token);
     request->addArgument("method", RTM::TASKS_NOTES_EDIT);
     request->addArgument("timeline", timeline);
-    request->addArgument("list_id", listID);
-    request->addArgument("taskseries_id", taskSeriesID);
-    request->addArgument("task_id", taskID);
+    request->addArgument("note_id", noteID);
     request->addArgument("note_title", noteTitle);
     request->addArgument("note_text", noteText);
+    request->sendRequest();
+}
+
+void RTM::Service::timeConvert(QString toTimezone)
+{
+    RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(timeConvertFinished(QVariantMap,RTM::ResponseStatus)));
+    request->addArgument("api_key", apiKey);
+    request->addArgument("auth_token", token);
+    request->addArgument("method", RTM::TIME_CONVERT);
+    request->addArgument("to_timezone", toTimezone);
     request->sendRequest();
 }
 
@@ -593,6 +624,17 @@ void RTM::Service::timeConvert(QString toTimezone, QMap<QString, QString> optArg
         request->addArgument("from_timezone", optArgs.value("from_timezone"));
     if(optArgs.contains("time"))
         request->addArgument("time", optArgs.value("time"));
+    request->sendRequest();
+}
+
+void RTM::Service::timeParse(QString text)
+{
+    RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(timeParseFinished(QVariantMap,RTM::ResponseStatus)));
+    request->addArgument("api_key", apiKey);
+    request->addArgument("auth_token", token);
+    request->addArgument("method", RTM::TIME_PARSE);
+    request->addArgument("text", text);
     request->sendRequest();
 }
 
@@ -633,11 +675,21 @@ void RTM::Service::timezonesGetList()
 void RTM::Service::transactionsUndo(QString timeline, QString transactionID)
 {
     RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksNotesEditFinished(QVariantMap,RTM::ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(transactionsUndoFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", apiKey);
     request->addArgument("auth_token", token);
     request->addArgument("method", RTM::TRANSACTIONS_UNDO);
     request->addArgument("timeline", timeline);
     request->addArgument("transaction_id", transactionID);
+    request->sendRequest();
+}
+
+void RTM::Service::testLogin()
+{
+    RTM::Request * request = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(testLoginFinished(QVariantMap,RTM::ResponseStatus)));
+    request->addArgument("api_key", apiKey);
+    request->addArgument("auth_token", token);
+    request->addArgument("method", RTM::TEST_LOGIN);
     request->sendRequest();
 }

@@ -57,7 +57,6 @@ namespace RTM {
         void locationsGetListFinished(QVariantMap response, RTM::ResponseStatus status);
         void settingsGetListFinished(QVariantMap response, RTM::ResponseStatus status);
         void tasksAddFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksSmartAddFinished(QVariantMap response, RTM::ResponseStatus status);
         void tasksAddTagsFinished(QVariantMap response, RTM::ResponseStatus status);
         void tasksCompleteFinished(QVariantMap response, RTM::ResponseStatus status);
         void tasksDeleteFinished(QVariantMap response, RTM::ResponseStatus status);
@@ -83,11 +82,11 @@ namespace RTM {
         void timelinesCreateFinished(QVariantMap response, RTM::ResponseStatus status);
         void timezonesGetListFinished(QVariantMap response, RTM::ResponseStatus status);
         void transactionsUndoFinished(QVariantMap response, RTM::ResponseStatus status);
+        void testLoginFinished(QVariantMap response, RTM::ResponseStatus status);
 
     public slots:
         void authCheckToken(QString token);
         void authGetToken();
-
         void contactsAdd(QString timeline, QString contact);
         void contactsDelete(QString timeline, QString contact);
         void contactsGetList();
@@ -100,7 +99,7 @@ namespace RTM {
         void listsArchive(QString timeline, QString listID);
         void listsDelete(QString timeline, QString listID);
         void listsGetList();
-        void listsSetDefaultList(QString timeline, QString listID);
+        void listsSetDefaultList(QString timeline, QString listID = "");
         void listsSetName(QString timeline, QString listID, QString listName);
         void listsUnarchive(QString timeline, QString listID);
         void locationsGetList();
@@ -110,14 +109,16 @@ namespace RTM {
         void tasksAddTags(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString tags);
         void tasksComplete(QString timeline, QString listID, QString taskSeriesID, QString taskID);
         void tasksDelete(QString timeline, QString listID, QString taskSeriesID, QString taskID);
+        void tasksGetList();
         void tasksGetList(QMap<QString, QString> args);
         void tasksMovePriority(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString direction);
         void tasksMoveTo(QString timeline, QString fromListID, QString toListID, QString taskSeriesID, QString taskID);
         void tasksPostpone(QString timeline, QString listID, QString taskSeriesID, QString taskID);
         void tasksRemoveTags(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString tags);
+        void tasksSetDueDate(QString timeline, QString listID, QString taskSeriesID, QString taskID);
         void tasksSetDueDate(QString timeline, QString listID, QString taskSeriesID, QString taskID, QMap<QString, QString> optArgs);
         void tasksSetEstimate(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString estimate = "");
-        void tasksSetLocation(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString location = "");
+        void tasksSetLocation(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString locationID = "");
         void tasksSetName(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString taskName);
         void tasksSetPriority(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString priority = "");
         void tasksSetRecurrence(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString repeat = "");
@@ -125,13 +126,16 @@ namespace RTM {
         void tasksSetUrl(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString url = "");
         void tasksUncomplete(QString timeline, QString listID, QString taskSeriesID, QString taskID);
         void tasksNotesAdd(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString noteTitle, QString noteText);
-        void tasksNotesDelete(QString timeline, QString listID, QString taskSeriesID, QString , QString noteID);
-        void tasksNotesEdit(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString noteTitle, QString noteText);
+        void tasksNotesDelete(QString timeline, QString noteID);
+        void tasksNotesEdit(QString timeline, QString noteID, QString noteTitle, QString noteText);
+        void timeConvert(QString toTimezone);
         void timeConvert(QString toTimezone, QMap<QString, QString> optArgs);
+        void timeParse(QString text);
         void timeParse(QString text, QMap<QString, QString> optArgs);
         void timelinesCreate();
         void timezonesGetList();
         void transactionsUndo(QString timeline, QString transactionID);
+        void testLogin();
 
     protected slots:
 
