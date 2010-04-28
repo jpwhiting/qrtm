@@ -31,41 +31,41 @@ RTM::Authentication::Authentication(QString key, QString sharedSecret, RTM::Perm
 {
 }
 
-inline void RTM::Authentication::setApiKey(QString key)
+void RTM::Authentication::setApiKey(QString key)
 {
     apiKey = key;
 }
 
-inline void RTM::Authentication::setSharedSecret(QString secret)
+void RTM::Authentication::setSharedSecret(QString secret)
 {
     sharedSecret = secret;
 }
 
-inline void RTM::Authentication::setPermission(RTM::Permission perm)
+void RTM::Authentication::setPermission(RTM::Permission perm)
 {
     permission = perm;
 }
 
-inline void RTM::Authentication::setToken(QString tok) {
+void RTM::Authentication::setToken(QString tok) {
     token = tok;
 }
 
-inline QString RTM::Authentication::getApiKey()
+QString RTM::Authentication::getApiKey()
 {
     return apiKey;
 }
 
-inline QString RTM::Authentication::getSharedSecret()
+QString RTM::Authentication::getSharedSecret()
 {
     return sharedSecret;
 }
 
-inline RTM::Permission RTM::Authentication::getPermission()
+RTM::Permission RTM::Authentication::getPermission()
 {
     return permission;
 }
 
-inline QString RTM::Authentication::getToken()
+QString RTM::Authentication::getToken()
 {
     return token;
 }
