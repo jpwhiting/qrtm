@@ -20,10 +20,14 @@
 #define SERVICE_H
 
 #include "rtm.h"
-#include "authentication.h"
 #include <QObject>
+#include <QtCore/QVariantMap>
+
+
 
 namespace RTM {
+
+    class Authentication;
 
     class RTMAPISHARED_EXPORT Service : public QObject
     {
@@ -31,62 +35,63 @@ namespace RTM {
 
     public:
         Service(QString key, QString secret, QObject *parent = 0);
+        ~Service();
         void setToken(QString tok);
-        RTM::Permission getPermission();
+        Permission getPermission();
     protected:
 
     signals:
         void authenticationSuccessful(QVariantMap response);
-        void authenticationFailed(QVariantMap response, RTM::ResponseStatus status);
-        void authCheckTokenFinished(QVariantMap response, RTM::ResponseStatus status);
-        void authGetTokenFinished(QString token, RTM::ResponseStatus status);
-        void contactsAddFinished(QVariantMap response, RTM::ResponseStatus status);
-        void contactsDeleteFinished(QVariantMap response, RTM::ResponseStatus status);
-        void contactsGetListFinished(QVariantMap response, RTM::ResponseStatus status);
-        void groupsAddFinished(QVariantMap response, RTM::ResponseStatus status);
-        void groupsAddContactFinished(QVariantMap response, RTM::ResponseStatus status);
-        void groupsDeleteFinished(QVariantMap response, RTM::ResponseStatus status);
-        void groupsGetListFinished(QVariantMap response, RTM::ResponseStatus status);
-        void groupsRemoveContactFinished(QVariantMap response, RTM::ResponseStatus status);
-        void listsAddFinished(QVariantMap response, RTM::ResponseStatus status);
-        void listsArchiveFinished(QVariantMap response, RTM::ResponseStatus status);
-        void listsDeleteFinished(QVariantMap response, RTM::ResponseStatus status);
-        void listsGetListFinished(QVariantMap response, RTM::ResponseStatus status);
-        void listsSetDefaultListFinished(QVariantMap response, RTM::ResponseStatus status);
-        void listsSetNameFinished(QVariantMap response, RTM::ResponseStatus status);
-        void listsUnarchiveFinished(QVariantMap response, RTM::ResponseStatus status);
-        void locationsGetListFinished(QVariantMap response, RTM::ResponseStatus status);
-        void settingsGetListFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksAddFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksAddTagsFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksCompleteFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksDeleteFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksGetListFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksMovePriorityFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksMoveToFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksPostponeFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksRemoveTagsFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksSetDueDateFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksSetEstimateFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksSetLocationFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksSetNameFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksSetPriorityFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksSetRecurrenceFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksSetTagsFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksSetUrlFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksUncompleteFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksNotesAddFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksNotesDeleteFinished(QVariantMap response, RTM::ResponseStatus status);
-        void tasksNotesEditFinished(QVariantMap response, RTM::ResponseStatus status);
-        void timeConvertFinished(QVariantMap response, RTM::ResponseStatus status);
-        void timeParseFinished(QVariantMap response, RTM::ResponseStatus status);
-        void timelinesCreateFinished(QVariantMap response, RTM::ResponseStatus status);
-        void timezonesGetListFinished(QVariantMap response, RTM::ResponseStatus status);
-        void transactionsUndoFinished(QVariantMap response, RTM::ResponseStatus status);
-        void testLoginFinished(QVariantMap response, RTM::ResponseStatus status);
+        void authenticationFailed(QVariantMap response, ResponseStatus status);
+        void authCheckTokenFinished(QVariantMap response, ResponseStatus status);
+        void authGetTokenFinished(QString token, ResponseStatus status);
+        void contactsAddFinished(QVariantMap response, ResponseStatus status);
+        void contactsDeleteFinished(QVariantMap response, ResponseStatus status);
+        void contactsGetListFinished(QVariantMap response, ResponseStatus status);
+        void groupsAddFinished(QVariantMap response, ResponseStatus status);
+        void groupsAddContactFinished(QVariantMap response, ResponseStatus status);
+        void groupsDeleteFinished(QVariantMap response, ResponseStatus status);
+        void groupsGetListFinished(QVariantMap response, ResponseStatus status);
+        void groupsRemoveContactFinished(QVariantMap response, ResponseStatus status);
+        void listsAddFinished(QVariantMap response, ResponseStatus status);
+        void listsArchiveFinished(QVariantMap response, ResponseStatus status);
+        void listsDeleteFinished(QVariantMap response, ResponseStatus status);
+        void listsGetListFinished(QVariantMap response, ResponseStatus status);
+        void listsSetDefaultListFinished(QVariantMap response, ResponseStatus status);
+        void listsSetNameFinished(QVariantMap response, ResponseStatus status);
+        void listsUnarchiveFinished(QVariantMap response, ResponseStatus status);
+        void locationsGetListFinished(QVariantMap response, ResponseStatus status);
+        void settingsGetListFinished(QVariantMap response, ResponseStatus status);
+        void tasksAddFinished(QVariantMap response, ResponseStatus status);
+        void tasksAddTagsFinished(QVariantMap response, ResponseStatus status);
+        void tasksCompleteFinished(QVariantMap response, ResponseStatus status);
+        void tasksDeleteFinished(QVariantMap response, ResponseStatus status);
+        void tasksGetListFinished(QVariantMap response, ResponseStatus status);
+        void tasksMovePriorityFinished(QVariantMap response, ResponseStatus status);
+        void tasksMoveToFinished(QVariantMap response, ResponseStatus status);
+        void tasksPostponeFinished(QVariantMap response, ResponseStatus status);
+        void tasksRemoveTagsFinished(QVariantMap response, ResponseStatus status);
+        void tasksSetDueDateFinished(QVariantMap response, ResponseStatus status);
+        void tasksSetEstimateFinished(QVariantMap response, ResponseStatus status);
+        void tasksSetLocationFinished(QVariantMap response, ResponseStatus status);
+        void tasksSetNameFinished(QVariantMap response, ResponseStatus status);
+        void tasksSetPriorityFinished(QVariantMap response, ResponseStatus status);
+        void tasksSetRecurrenceFinished(QVariantMap response, ResponseStatus status);
+        void tasksSetTagsFinished(QVariantMap response, ResponseStatus status);
+        void tasksSetUrlFinished(QVariantMap response, ResponseStatus status);
+        void tasksUncompleteFinished(QVariantMap response, ResponseStatus status);
+        void tasksNotesAddFinished(QVariantMap response, ResponseStatus status);
+        void tasksNotesDeleteFinished(QVariantMap response, ResponseStatus status);
+        void tasksNotesEditFinished(QVariantMap response, ResponseStatus status);
+        void timeConvertFinished(QVariantMap response, ResponseStatus status);
+        void timeParseFinished(QVariantMap response, ResponseStatus status);
+        void timelinesCreateFinished(QVariantMap response, ResponseStatus status);
+        void timezonesGetListFinished(QVariantMap response, ResponseStatus status);
+        void transactionsUndoFinished(QVariantMap response, ResponseStatus status);
+        void testLoginFinished(QVariantMap response, ResponseStatus status);
 
     public slots:
-        void authenticate(RTM::Permission p);
+        void authenticate(Permission p);
         void authCheckToken(QString token);
         void authGetToken();
         void contactsAdd(QString timeline, QString contact);
@@ -142,7 +147,7 @@ namespace RTM {
     protected slots:
 
     protected:
-        RTM::Authentication authentication;
+        Authentication * authentication;
         QString apiKey;
         QString sharedSecret;
         QString token;

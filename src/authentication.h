@@ -24,44 +24,44 @@
 
 namespace RTM
 {
-    class RTMAPISHARED_EXPORT Authentication : public RTM::Request
+    class Authentication : public Request
     {
         Q_OBJECT
 
     public:
-        Authentication(QString key, QString secret, RTM::Permission perms, QString token = "", QObject *parent = 0);
+        Authentication(QString key, QString secret, Permission perms, QString token = "", QObject *parent = 0);
         void setApiKey(QString key);
         void setSharedSecret(QString secret);
-        void setPermission(RTM::Permission perm);
+        void setPermission(Permission perm);
         void setToken(QString tok);
         QString getApiKey();
         QString getSharedSecret();
-        RTM::Permission getPermission();
+        Permission getPermission();
         QString getToken();
 
     protected:
-        QString getPermission(RTM::Permission p);
+        QString getPermission(Permission p);
 
     signals:
         void authFinished(QVariantMap auth);
-        void authError(QVariantMap response, RTM::ResponseStatus status);
+        void authError(QVariantMap response, ResponseStatus status);
 
     public slots:
         void beginAuth();
 
     protected slots:
-        void frobReceived(QVariantMap response, RTM::ResponseStatus status);
+        void frobReceived(QVariantMap response, ResponseStatus status);
         void login();
         void requestToken();
-        void tokenReceived(QVariantMap response, RTM::ResponseStatus status);
+        void tokenReceived(QVariantMap response, ResponseStatus status);
 
     protected:
         QString apiKey;
         QString frob;
         QString token;
-        RTM::Permission permission;
-        RTM::Request * frobRequest;
-        RTM::Request * tokenRequest;
+        Permission permission;
+        Request * frobRequest;
+        Request * tokenRequest;
     };
 }
 

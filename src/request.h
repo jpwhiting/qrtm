@@ -32,23 +32,23 @@ template <class x, class y> class QMap;
 
 namespace RTM
 {
-    class RTMAPISHARED_EXPORT Request : public QObject
+    class Request : public QObject
     {
         Q_OBJECT
 
     public:
-        Request(QString secret, QString baseURL = RTM::baseMethodUrl, RTM::MethodType rType = RTM::Signed, QObject *parent = 0);
+        Request(QString secret, QString baseURL = baseMethodUrl, MethodType rType = Signed, QObject *parent = 0);
         void addArgument(QString key, QString value);
         void clearArguments();
         void setSecret(QString secret);
-        void setType(RTM::MethodType t);
+        void setType(MethodType t);
     protected:
         QUrl prepareUrl();
         void signRequest();
         void unsignRequest();
 
     signals:
-        void requestFinished(QVariantMap response, RTM::ResponseStatus status);
+        void requestFinished(QVariantMap response, ResponseStatus status);
 
     public slots:
         void sendRequest();
@@ -62,7 +62,7 @@ namespace RTM
         QString baseUrl;
         QString sharedSecret;
         QNetworkAccessManager * accessManager;
-        RTM::MethodType type;
+        MethodType type;
         QJson::Parser jsonParser;
     };
 }

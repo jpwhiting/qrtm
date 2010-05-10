@@ -25,56 +25,58 @@
 #include <QtGui/QPushButton>
 #include <QtWebKit/QWebView>
 
-RTM::Authentication::Authentication(QString key, QString sharedSecret, RTM::Permission perms, QString token, QObject *parent) :
-    RTM::Request(sharedSecret, RTM::baseAuthUrl, RTM::Signed, parent), apiKey(key), token(token), permission(perms)
+using namespace RTM;
+
+Authentication::Authentication(QString key, QString sharedSecret, Permission perms, QString token, QObject *parent) :
+    Request(sharedSecret, baseAuthUrl, Signed, parent), apiKey(key), token(token), permission(perms)
 {
 }
 
-void RTM::Authentication::setApiKey(QString key)
+void Authentication::setApiKey(QString key)
 {
     apiKey = key;
 }
 
-void RTM::Authentication::setSharedSecret(QString secret)
+void Authentication::setSharedSecret(QString secret)
 {
     sharedSecret = secret;
 }
 
-void RTM::Authentication::setPermission(RTM::Permission perm)
+void Authentication::setPermission(Permission perm)
 {
     permission = perm;
 }
 
-void RTM::Authentication::setToken(QString tok) {
+void Authentication::setToken(QString tok) {
     token = tok;
 }
 
-QString RTM::Authentication::getApiKey()
+QString Authentication::getApiKey()
 {
     return apiKey;
 }
 
-QString RTM::Authentication::getSharedSecret()
+QString Authentication::getSharedSecret()
 {
     return sharedSecret;
 }
 
-RTM::Permission RTM::Authentication::getPermission()
+Permission Authentication::getPermission()
 {
     return permission;
 }
 
-QString RTM::Authentication::getToken()
+QString Authentication::getToken()
 {
     return token;
 }
 
-void RTM::Authentication::beginAuth()
+void Authentication::beginAuth()
 {
     if(frob.isEmpty()) {
         qDebug() << "Frob empty, new frob requested\n";
-        frobRequest = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
-        connect(frobRequest, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SLOT(frobReceived(QVariantMap, RTM::ResponseStatus)));
+        frobRequest = new Request(sharedSecret, baseMethodUrl, Signed, this);
+        connect(frobRequest, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SLOT(frobReceived(QVariantMap, ResponseStatus)));
         frobRequest->addArgument("api_key", apiKey);
         frobRequest->addArgument("method", "rtm.auth.getFrob");
         frobRequest->sendRequest();
@@ -84,9 +86,9 @@ void RTM::Authentication::beginAuth()
     }
 }
 
-void RTM::Authentication::frobReceived(QVariantMap response, RTM::ResponseStatus status)
+void Authentication::frobReceived(QVariantMap response, ResponseStatus status)
 {
-    if(status == RTM::OK) {
+    if(status == OK) {
         frob = response["frob"].toString();
         qDebug() << "Frob: " << frob << " received\n";
         login();
@@ -96,7 +98,7 @@ void RTM::Authentication::frobReceived(QVariantMap response, RTM::ResponseStatus
     }
 }
 
-void RTM::Authentication::login()
+void Authentication::login()
 {
     qDebug() << "Login and authorize\n";
     QWidget * loginWidget = new QWidget();
@@ -126,21 +128,21 @@ void RTM::Authentication::login()
     loginWidget->show();
 }
 
-void RTM::Authentication::requestToken()
+void Authentication::requestToken()
 {
     qDebug() << "Authorization completed get token\n";
 
-    tokenRequest = new RTM::Request(sharedSecret, RTM::baseMethodUrl, RTM::Signed, this);
-    connect(tokenRequest, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SLOT(tokenReceived(QVariantMap, RTM::ResponseStatus)));
+    tokenRequest = new Request(sharedSecret, baseMethodUrl, Signed, this);
+    connect(tokenRequest, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SLOT(tokenReceived(QVariantMap, ResponseStatus)));
     tokenRequest->addArgument("api_key", apiKey);
     tokenRequest->addArgument("frob", frob);
     tokenRequest->addArgument("method", "rtm.auth.getToken");
     tokenRequest->sendRequest();
 }
 
-void RTM::Authentication::tokenReceived(QVariantMap response, RTM::ResponseStatus status)
+void Authentication::tokenReceived(QVariantMap response, ResponseStatus status)
 {
-    if(status == RTM::OK) {
+    if(status == OK) {
         token = (response["auth"].toMap())["token"].toString();
         qDebug() << "Token: " << token << " received\n";
         emit authFinished(response["auth"].toMap());
@@ -149,14 +151,14 @@ void RTM::Authentication::tokenReceived(QVariantMap response, RTM::ResponseStatu
         emit authError(response, status);
 }
 
-QString RTM::Authentication::getPermission(RTM::Permission p)
+QString Authentication::getPermission(Permission p)
 {
     switch(p) {
-    case RTM::Read:
+    case Read:
         return "read";
-    case RTM::Write:
+    case Write:
         return "write";
-    case RTM::Delete:
+    case Delete:
         return "delete";
     default:
         return "";

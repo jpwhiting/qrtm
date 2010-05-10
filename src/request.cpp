@@ -25,39 +25,40 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
+using namespace RTM;
 
-RTM::Request::Request(QString secret, QString baseURL, RTM::MethodType rType, QObject *parent) :
+Request::Request(QString secret, QString baseURL, MethodType rType, QObject *parent) :
     QObject(parent), baseUrl(baseURL), sharedSecret(secret), accessManager(new QNetworkAccessManager(this)), type(rType)
 {
     connect(accessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(responseReceived(QNetworkReply *)));
 }
 
-void RTM::Request::addArgument(QString key, QString value)
+void Request::addArgument(QString key, QString value)
 {
     arguments.insert(key, value);
 }
 
-void RTM::Request::clearArguments()
+void Request::clearArguments()
 {
     arguments.clear();
 }
 
-void RTM::Request::setSecret(QString secret)
+void Request::setSecret(QString secret)
 {
     sharedSecret = secret;
 }
 
-void RTM::Request::setType(RTM::MethodType t)
+void Request::setType(MethodType t)
 {
     type = t;
 }
 
-QUrl RTM::Request::prepareUrl()
+QUrl Request::prepareUrl()
 {
     arguments.insert("format", "json");
     QString url = baseUrl;
 
-    if(type == RTM::Signed) {
+    if(type == Signed) {
         signRequest();
     }
     else {
@@ -75,7 +76,7 @@ QUrl RTM::Request::prepareUrl()
     return QUrl(url);
 }
 
-void RTM::Request::signRequest()
+void Request::signRequest()
 {
     QString rawSign = sharedSecret;
     QMapIterator<QString, QString> it(arguments);
@@ -91,24 +92,24 @@ void RTM::Request::signRequest()
     }
 }
 
-void RTM::Request::unsignRequest()
+void Request::unsignRequest()
 {
     arguments.remove("api_sig");
 }
 
-void RTM::Request::sendRequest()
+void Request::sendRequest()
 {
     accessManager->get(QNetworkRequest(prepareUrl()));
 }
 
-QString RTM::Request::sendSyncRequest(QUrl url)
+QString Request::sendSyncRequest(QUrl url)
 {
     // TODO if necessary
 
     return url.toString();
 }
 
-void RTM::Request::responseReceived(QNetworkReply * reply)
+void Request::responseReceived(QNetworkReply * reply)
 {
     bool ok;
     QVariantMap result;
@@ -125,13 +126,13 @@ void RTM::Request::responseReceived(QNetworkReply * reply)
         QString status = result["stat"].toString();
 
         if(status == "ok") {
-            emit requestFinished(result, RTM::OK);
+            emit requestFinished(result, OK);
         }
         else {
-            emit requestFinished(result, RTM::Fail);
+            emit requestFinished(result, Fail);
         }
     }
     else {
-        emit requestFinished(result, RTM::Malformed);
+        emit requestFinished(result, Malformed);
     }
 }
