@@ -41,6 +41,7 @@ namespace RTM {
     protected:
 
     signals:
+        void authenticationLoadUrl(const QUrl &url);
         void authenticationSuccessful(QVariantMap response);
         void authenticationFailed(QVariantMap response, ResponseStatus status);
         void authCheckTokenFinished(QVariantMap response, ResponseStatus status);
@@ -92,6 +93,7 @@ namespace RTM {
 
     public slots:
         void authenticate(Permission p);
+        void authRequestToken();
         void authCheckToken(QString token);
         void authGetToken();
         void contactsAdd(QString timeline, QString contact);

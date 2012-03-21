@@ -21,7 +21,7 @@
 
 #include "libqrtm_global.h"
 #include <QtCore/QString>
-#include "libqjson/parser.h"
+#include <qjson/parser.h>
 
 namespace RTM
 {

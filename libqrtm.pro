@@ -1,49 +1,51 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-04-08T00:36:49
 # -------------------------------------------------
-QT += network \
-    webkit
-TARGET = libqrtm
+QT += network
+TARGET = qrtm
 TEMPLATE = lib
 DEFINES += RTMAPI_LIBRARY
-SOURCES += src/loginview.cpp \
-    src/request.cpp \
-    src/libqjson/serializerrunnable.cpp \
-    src/libqjson/serializer.cpp \
-    src/libqjson/qobjecthelper.cpp \
-    src/libqjson/parserrunnable.cpp \
-    src/libqjson/parser.cpp \
-    src/libqjson/json_scanner.cpp \
-    src/libqjson/json_parser.cc \
+CONFIG += link_pkgconfig create_pc create_prl no_install_prl
+PKGCONFIG += QJson
+
+SOURCES += src/request.cpp \
     src/authentication.cpp \
     src/service.cpp
 HEADERS += src/libqrtm_global.h \
-    src/loginview.h \
     src/request.h \
     src/rtm.h \
-    src/libqjson/stack.hh \
-    src/libqjson/serializerrunnable.h \
-    src/libqjson/serializer.h \
-    src/libqjson/qobjecthelper.h \
-    src/libqjson/qjson_export.h \
-    src/libqjson/qjson_debug.h \
-    src/libqjson/position.hh \
-    src/libqjson/parserrunnable.h \
-    src/libqjson/parser_p.h \
-    src/libqjson/parser.h \
-    src/libqjson/location.hh \
-    src/libqjson/json_scanner.h \
-    src/libqjson/json_parser.hh \
     src/authentication.h \
     src/service.h
-OTHER_FILES += src/libqjson/json_parser.yy
+OTHER_FILES += qtc_packaging/debian_harmattan/rules \
+    qtc_packaging/debian_harmattan/README \
+    qtc_packaging/debian_harmattan/manifest.aegis \
+    qtc_packaging/debian_harmattan/copyright \
+    qtc_packaging/debian_harmattan/control \
+    qtc_packaging/debian_harmattan/compat \
+    qtc_packaging/debian_harmattan/changelog
+
 win32 { 
     DESTDIR = .\build\win32
     MOC_DIR = .\build\objects
     OBJECTS_DIR = .\build\objects
 }
 unix { 
-    DESTDIR = ./build/unix
-    MOC_DIR = ./build/objects
-    OBJECTS_DIR = ./build/objects
+target.path = /usr/local/lib
+
+QMAKE_PKGCONFIG_NAME = qrtm
+QMAKE_PKGCONFIG_DESCRIPTION = Qt Remember The Milk library
+QMAKE_PKGCONFIG_LIBDIR = $$target.path
+QMAKE_PKGCONFIG_INCDIR = $$target.path
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+
+headers.path = /usr/local/include/qrtm
+headers.files = src/libqrtm_global.h \
+    src/loginview.h \
+    src/request.h \
+    src/rtm.h \
+    src/authentication.h \
+    src/service.h
+
 }
+
+INSTALLS += target headers

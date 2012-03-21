@@ -20,7 +20,7 @@
 #define REQUEST_H
 
 #include "rtm.h"
-#include "libqjson/parser.h"
+#include <qjson/parser.h>
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>

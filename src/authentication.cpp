@@ -23,7 +23,6 @@
 #include <QtGui/QWidget>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
-#include <QtWebKit/QWebView>
 
 using namespace RTM;
 
@@ -74,7 +73,6 @@ QString Authentication::getToken()
 void Authentication::beginAuth()
 {
     if(frob.isEmpty()) {
-        qDebug() << "Frob empty, new frob requested\n";
         frobRequest = new Request(sharedSecret, baseMethodUrl, Signed, this);
         connect(frobRequest, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SLOT(frobReceived(QVariantMap, ResponseStatus)));
         frobRequest->addArgument("api_key", apiKey);
@@ -101,31 +99,13 @@ void Authentication::frobReceived(QVariantMap response, ResponseStatus status)
 void Authentication::login()
 {
     qDebug() << "Login and authorize\n";
-    QWidget * loginWidget = new QWidget();
-    QVBoxLayout * layout = new QVBoxLayout(loginWidget);
-    QPushButton * button = new QPushButton(loginWidget);
-    QWebView * loginPage  = new QWebView(loginWidget);
-
-    button->setText("Click after authorization completed");
 
     clearArguments();
     addArgument("api_key", apiKey);
     addArgument("perms", getPermission(permission));
     addArgument("frob", frob);
 
-    loginPage->setUrl(prepareUrl());
-    qDebug() << "Login URL:" << loginPage->url().toString() << "\n";
-    loginPage->resize(800, 600);
-    loginPage->scroll(0, 200);
-
-    layout->addWidget(loginPage);
-    layout->addWidget(button);
-
-    connect(button, SIGNAL(clicked(bool)), loginWidget, SLOT(hide()));
-    connect(button, SIGNAL(clicked(bool)), loginWidget, SLOT(deleteLater()));
-    connect(button, SIGNAL(clicked(bool)), this, SLOT(requestToken()));
-
-    loginWidget->show();
+    emit loadAuthUrl(prepareUrl());
 }
 
 void Authentication::requestToken()

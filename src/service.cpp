@@ -25,6 +25,9 @@ Service::Service(QString key, QString secret, QObject *parent) :
         QObject(parent), authentication(0), apiKey(key), sharedSecret(secret)
 {
     authentication = new Authentication(key, secret, Read, "", this);
+    connect(authentication, SIGNAL(authFinished(QVariantMap)), this, SIGNAL(authenticationSuccessful(QVariantMap)));
+    connect(authentication, SIGNAL(authError(QVariantMap,ResponseStatus)), this, SIGNAL(authenticationFailed(QVariantMap,ResponseStatus)));
+    connect(authentication, SIGNAL(loadAuthUrl(QUrl)), this, SIGNAL(authenticationLoadUrl(QUrl)));
 }
 
 Service::~Service()
@@ -45,9 +48,12 @@ Permission Service::getPermission()
 void Service::authenticate(Permission p)
 {
     authentication->setPermission(p);
-    connect(authentication, SIGNAL(authFinished(QVariantMap)), this, SIGNAL(authenticationSuccessful(QVariantMap)));
-    connect(authentication, SIGNAL(authError(QVariantMap,ResponseStatus)), this, SIGNAL(authenticationFailed(QVariantMap,ResponseStatus)));
     authentication->beginAuth();
+}
+
+void Service::authRequestToken()
+{
+    authentication->requestToken();
 }
 
 void Service::authCheckToken(QString tok)

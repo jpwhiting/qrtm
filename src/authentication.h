@@ -43,16 +43,17 @@ namespace RTM
         QString getPermission(Permission p);
 
     signals:
+        void loadAuthUrl(const QUrl &url);
         void authFinished(QVariantMap auth);
         void authError(QVariantMap response, ResponseStatus status);
 
     public slots:
         void beginAuth();
+        void requestToken();
 
     protected slots:
         void frobReceived(QVariantMap response, ResponseStatus status);
         void login();
-        void requestToken();
         void tokenReceived(QVariantMap response, ResponseStatus status);
 
     protected:
