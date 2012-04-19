@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2010  Sertac Olgunsoylu <sertacolgunsoylu@gmail.com>
+ *  Copyright (C) 2012  Jeremy Whiting <jpwhiting@kde.org>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,32 +29,49 @@
 namespace RTM {
 
     class Authentication;
+    class ListsModel;
+    class FilteredTasksModel;
 
     class RTMAPISHARED_EXPORT Service : public QObject
     {
         Q_OBJECT
+        Q_PROPERTY(RTM::ListsModel * listsModel READ getListsModel)
+        Q_PROPERTY(RTM::FilteredTasksModel * tasksModel READ getTasksModel)
 
     public:
+        Service(QObject *parent = 0);
         Service(QString key, QString secret, QObject *parent = 0);
         ~Service();
-        void setToken(QString tok);
+
+        void setKey(QString key, QString secret);
+
+        // Get the authenticated token.
+        // Returns empty QString if not authenticated.
+        QString getToken() const;
+
         Permission getPermission();
-    protected:
+
+        Q_INVOKABLE ListsModel *getListsModel();
+        Q_INVOKABLE FilteredTasksModel *getTasksModel();
+
+        Q_INVOKABLE void setListId(QString id);
 
     signals:
+        // Signal the ui should load the given url in order to authenticate.
         void authenticationLoadUrl(const QUrl &url);
-        void authenticationSuccessful(QVariantMap response);
-        void authenticationFailed(QVariantMap response, ResponseStatus status);
-        void authCheckTokenFinished(QVariantMap response, ResponseStatus status);
-        void authGetTokenFinished(QString token, ResponseStatus status);
+        // Signal authentication is done.
+        void authenticationDone(bool success);
+
         void contactsAddFinished(QVariantMap response, ResponseStatus status);
         void contactsDeleteFinished(QVariantMap response, ResponseStatus status);
         void contactsGetListFinished(QVariantMap response, ResponseStatus status);
+
         void groupsAddFinished(QVariantMap response, ResponseStatus status);
         void groupsAddContactFinished(QVariantMap response, ResponseStatus status);
         void groupsDeleteFinished(QVariantMap response, ResponseStatus status);
         void groupsGetListFinished(QVariantMap response, ResponseStatus status);
         void groupsRemoveContactFinished(QVariantMap response, ResponseStatus status);
+
         void listsAddFinished(QVariantMap response, ResponseStatus status);
         void listsArchiveFinished(QVariantMap response, ResponseStatus status);
         void listsDeleteFinished(QVariantMap response, ResponseStatus status);
@@ -61,8 +79,11 @@ namespace RTM {
         void listsSetDefaultListFinished(QVariantMap response, ResponseStatus status);
         void listsSetNameFinished(QVariantMap response, ResponseStatus status);
         void listsUnarchiveFinished(QVariantMap response, ResponseStatus status);
+
         void locationsGetListFinished(QVariantMap response, ResponseStatus status);
+
         void settingsGetListFinished(QVariantMap response, ResponseStatus status);
+
         void tasksAddFinished(QVariantMap response, ResponseStatus status);
         void tasksAddTagsFinished(QVariantMap response, ResponseStatus status);
         void tasksCompleteFinished(QVariantMap response, ResponseStatus status);
@@ -84,26 +105,37 @@ namespace RTM {
         void tasksNotesAddFinished(QVariantMap response, ResponseStatus status);
         void tasksNotesDeleteFinished(QVariantMap response, ResponseStatus status);
         void tasksNotesEditFinished(QVariantMap response, ResponseStatus status);
+
         void timeConvertFinished(QVariantMap response, ResponseStatus status);
         void timeParseFinished(QVariantMap response, ResponseStatus status);
+
         void timelinesCreateFinished(QVariantMap response, ResponseStatus status);
+
         void timezonesGetListFinished(QVariantMap response, ResponseStatus status);
+
         void transactionsUndoFinished(QVariantMap response, ResponseStatus status);
+
         void testLoginFinished(QVariantMap response, ResponseStatus status);
 
     public slots:
+        // Ask for given Permission.
+        // This will send authLoadUrl signal with url to load in a webview.
         void authenticate(Permission p);
+        // When user is done authenticating, call this to request their token.
         void authRequestToken();
+        // Call this to check a stored token.
         void authCheckToken(QString token);
-        void authGetToken();
+
         void contactsAdd(QString timeline, QString contact);
         void contactsDelete(QString timeline, QString contact);
         void contactsGetList();
+
         void groupsAdd(QString timeline, QString groupName);
         void groupsAddContact(QString timeline, QString groupID, QString contactID);
         void groupsDelete(QString timeline, QString groupID);
         void groupsGetList();
         void groupsRemoveContact(QString timeline, QString groupID, QString contactID);
+
         void listsAdd(QString timeline, QString listName, QString filter="");
         void listsArchive(QString timeline, QString listID);
         void listsDelete(QString timeline, QString listID);
@@ -111,8 +143,11 @@ namespace RTM {
         void listsSetDefaultList(QString timeline, QString listID = "");
         void listsSetName(QString timeline, QString listID, QString listName);
         void listsUnarchive(QString timeline, QString listID);
+
         void locationsGetList();
+
         void settingsGetList();
+
         void tasksAdd(QString timeline, QString taskName, QString listID = "");
         void tasksSmartAdd(QString timeline, QString taskName, QString listID = "");
         void tasksAddTags(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString tags);
@@ -137,22 +172,29 @@ namespace RTM {
         void tasksNotesAdd(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString noteTitle, QString noteText);
         void tasksNotesDelete(QString timeline, QString noteID);
         void tasksNotesEdit(QString timeline, QString noteID, QString noteTitle, QString noteText);
+
         void timeConvert(QString toTimezone);
         void timeConvert(QString toTimezone, QMap<QString, QString> optArgs);
         void timeParse(QString text);
         void timeParse(QString text, QMap<QString, QString> optArgs);
+
         void timelinesCreate();
+
         void timezonesGetList();
+
         void transactionsUndo(QString timeline, QString transactionID);
+
         void testLogin();
 
-    protected slots:
+    private slots:
+        void onAuthFinished();
+        void onAuthError();
+        void onCheckTokenFinished(QVariantMap response, ResponseStatus status);
+        void onTasksGetListFinished(QVariantMap response, ResponseStatus status);
 
-    protected:
-        Authentication * authentication;
-        QString apiKey;
-        QString sharedSecret;
-        QString token;
+    private:
+        class Private;
+        Private *const d;
     };
 }
 

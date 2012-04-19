@@ -10,12 +10,22 @@ PKGCONFIG += QJson
 
 SOURCES += src/request.cpp \
     src/authentication.cpp \
-    src/service.cpp
+    src/service.cpp \
+    src/listsmodel.cpp \
+    src/tasksmodel.cpp \
+    src/list.cpp \
+    src/task.cpp \
+    src/filteredtasksmodel.cpp
 HEADERS += src/libqrtm_global.h \
     src/request.h \
     src/rtm.h \
     src/authentication.h \
-    src/service.h
+    src/service.h \
+    src/listsmodel.h \
+    src/tasksmodel.h \
+    src/list.h \
+    src/task.h \
+    src/filteredtasksmodel.h
 OTHER_FILES += qtc_packaging/debian_harmattan/rules \
     qtc_packaging/debian_harmattan/README \
     qtc_packaging/debian_harmattan/manifest.aegis \
@@ -30,7 +40,10 @@ win32 {
     OBJECTS_DIR = .\build\objects
 }
 unix { 
-target.path = /usr/local/lib
+isEmpty(PREFIX) {
+ PREFIX = /usr/local
+}
+target.path = $${PREFIX}/lib
 
 QMAKE_PKGCONFIG_NAME = qrtm
 QMAKE_PKGCONFIG_DESCRIPTION = Qt Remember The Milk library
@@ -38,13 +51,8 @@ QMAKE_PKGCONFIG_LIBDIR = $$target.path
 QMAKE_PKGCONFIG_INCDIR = $$target.path
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 
-headers.path = /usr/local/include/qrtm
-headers.files = src/libqrtm_global.h \
-    src/loginview.h \
-    src/request.h \
-    src/rtm.h \
-    src/authentication.h \
-    src/service.h
+headers.path = $${PREFIX}/include/qrtm
+headers.files = $$HEADERS
 
 }
 
