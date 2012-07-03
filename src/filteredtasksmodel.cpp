@@ -21,7 +21,6 @@
 #include "tasksmodel.h"
 
 #include <QDateTime>
-#include <QtDebug>
 
 namespace RTM
 {
@@ -107,7 +106,6 @@ bool FilteredTasksModel::lessThan(const QModelIndex &left,
     // If sorting by due date, do that first, then priority, then name.
     if (d->sortOrder == List::ByDueDate)
     {
-        qDebug() << "Sort order is by due date";
         if (left.data(TasksModel::DueDateRole).toDateTime() !=
                 right.data(TasksModel::DueDateRole).toDateTime())
             return left.data(TasksModel::DueDateRole).toDateTime() <
@@ -120,7 +118,6 @@ bool FilteredTasksModel::lessThan(const QModelIndex &left,
     // If sorting by priority, do that first, then due date, then name.
     if (d->sortOrder == List::ByPriority)
     {
-        qDebug() << "Sort order is by priority";
         if (left.data(TasksModel::PriorityRole).toUInt() !=
                 right.data(TasksModel::PriorityRole).toUInt())
             return left.data(TasksModel::PriorityRole).toUInt() <
@@ -131,7 +128,6 @@ bool FilteredTasksModel::lessThan(const QModelIndex &left,
                     right.data(TasksModel::DueDateRole).toDateTime();
     }
 
-    qDebug() << "Sorting by name";
     // If sorting by name, only sort by name.
     return QString::compare(left.data().toString(),
                             right.data().toString(), Qt::CaseInsensitive) < 0;
@@ -140,6 +136,14 @@ bool FilteredTasksModel::lessThan(const QModelIndex &left,
 bool FilteredTasksModel::Private::matchesFilter(const QModelIndex &index)
 {
     // Check if any parts match.
+}
+
+RTM::Task* FilteredTasksModel::taskForRow(const int row) const
+{
+    QModelIndex proxyIndex = index(row, 0, QModelIndex());
+    QModelIndex sourceIndex = mapToSource(proxyIndex);
+    TasksModel * model = qobject_cast<TasksModel*>(sourceModel());
+    return model->taskForRow(sourceIndex.row());
 }
 
 }

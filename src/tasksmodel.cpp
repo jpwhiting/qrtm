@@ -38,6 +38,8 @@ TasksModel::TasksModel(QObject *parent) :
     roles[Qt::DisplayRole] = "display";
     roles[PriorityRole] = "priority";
     roles[ListIdRole] = "listid";
+    roles[SeriesIdRole] = "seriesid";
+    roles[TaskIdRole] = "taskid";
     roles[CompletedRole] = "completed";
     roles[DueDateRole] = "duedate";
     roles[TagsRole] = "tags";
@@ -90,7 +92,7 @@ QVariant TasksModel::data ( const QModelIndex & index, int role) const
 
     if (index.isValid())
     {
-        Task task = d->tasks.at(index.row());
+        const Task &task = d->tasks.at(index.row());
         switch (role)
         {
         case Qt::DisplayRole:
@@ -101,6 +103,12 @@ QVariant TasksModel::data ( const QModelIndex & index, int role) const
             break;
         case ListIdRole:
             retval = task.listId();
+            break;
+        case SeriesIdRole:
+            retval = task.seriesId();
+            break;
+        case TaskIdRole:
+            retval = task.taskId();
             break;
         case CompletedRole:
             retval = task.completed();
@@ -120,13 +128,19 @@ QVariant TasksModel::data ( const QModelIndex & index, int role) const
         case UrlRole:
             retval = task.url();
             break;
-//        case TaskRole:
-//            retval = task;
-//            break;
         }
     }
 
     return retval;
+}
+
+RTM::Task* TasksModel::taskForRow(const int row) const
+{
+    Task * value = 0;
+    if (row >= 0 & row < d->tasks.size())
+        value = &(d->tasks[row]);
+
+    return value;
 }
 
 } // namespace RTM

@@ -20,6 +20,7 @@
 #define FILTEREDTASKSMODEL_H
 
 #include "list.h"
+#include "task.h"
 #include <QSortFilterProxyModel>
 
 namespace RTM
@@ -36,6 +37,8 @@ public:
     Q_INVOKABLE void setListParameters(const QString &id,
                                        List::SortOrder sortOrder,
                                        const QString &filter);
+
+    Q_INVOKABLE RTM::Task *taskForRow(const int row) const;
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
