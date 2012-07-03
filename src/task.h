@@ -21,7 +21,9 @@
 
 #include "rtm.h"
 
+#include <QDateTime>
 #include <QObject>
+#include <QStringList>
 #include <QVariantMap>
 
 namespace RTM {
@@ -30,6 +32,11 @@ class RTMAPISHARED_EXPORT Task: public QObject
 {
     Q_OBJECT
     Q_ENUMS(Priority)
+    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(Priority priority READ priority)
+    Q_PROPERTY(QString location READ location)
+    Q_PROPERTY(QDateTime duedate READ dueDate)
+    Q_PROPERTY(QStringList tags READ tags)
 
 public:
     enum Priority {
