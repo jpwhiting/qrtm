@@ -32,13 +32,15 @@ public:
     Private(Service *service)
     {
         authentication = 0;
-        tasksModel = new TasksModel;
+        tasksModel = new TasksModel(service);
         tasksModelFilter = new FilteredTasksModel;
         tasksModelFilter->setSourceModel(tasksModel);
         listsModel = new ListsModel(service);
 
         connect(service, SIGNAL(listsGetListFinished(QVariantMap,ResponseStatus)),
                 listsModel, SLOT(onGetListFinished(QVariantMap,ResponseStatus)));
+        connect(listsModel, SIGNAL(loadedListInfo(List&)),
+                service, SLOT(onLoadedListInfo(List&)));
     }
 
     Authentication * authentication;
@@ -48,6 +50,9 @@ public:
 
     ListsModel *listsModel;
     TasksModel *tasksModel;
+    QMap<Request*, QString> smartListRequestIds;
+    QMap<QString, TasksModel *> smartListTasksModels;
+
     FilteredTasksModel *tasksModelFilter;
 };
 
@@ -115,8 +120,26 @@ void Service::setListId(QString id)
     // Get the list parameters from from the listsModel.
     const List &list = d->listsModel->listFromId(id);
 
-    // Give the list parameters to the filtered model
-    d->tasksModelFilter->setListParameters(id, list.sortOrder(), list.filter());
+    if (list.isSmart())
+    {
+        Q_ASSERT(d->smartListTasksModels.contains(list.id()));
+
+        TasksModel *model = d->smartListTasksModels.value(list.id());
+        if (d->tasksModelFilter->sourceModel() != model)
+            d->tasksModelFilter->setSourceModel(model);
+
+        // Give the list parameters to the filtered model
+        d->tasksModelFilter->setListParameters(QString(), list.sortOrder());
+    }
+    else
+    {
+        // Reset the source model to the main model if needed.
+        if (d->tasksModelFilter->sourceModel() != d->tasksModel)
+            d->tasksModelFilter->setSourceModel(d->tasksModel);
+
+        // Give the list parameters to the filtered model
+        d->tasksModelFilter->setListParameters(id, list.sortOrder());
+    }
 }
 
 void Service::authenticate(Permission p)
@@ -153,7 +176,8 @@ void Service::authCheckToken(QString tok)
 {
     d->token = tok; // Store the token we are checking.
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Unsigned, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SLOT(onCheckTokenFinished(QVariantMap, ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)),
+            this, SLOT(onCheckTokenFinished(QVariantMap, ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", tok);
     request->addArgument("method", AUTH_CHECK_TOKEN);
@@ -175,18 +199,52 @@ void Service::onCheckTokenFinished(QVariantMap response, ResponseStatus status)
     }
 }
 
+void Service::onLoadedListInfo(List &listInfo)
+{
+    if (listInfo.isSmart())
+    {
+        // Create a model for this list.
+        TasksModel *newModel = new TasksModel(this);
+        d->smartListTasksModels.insert(listInfo.id(), newModel);
+
+        // Request this list's tasks from the server.
+        tasksGetSmartList(listInfo.id(), listInfo.filter());
+    }
+}
+
 void Service::onTasksGetListFinished(QVariantMap response, ResponseStatus status)
 {
     if (status == RTM::OK)
     {
-        qDebug() << "Got tasks list, adding tasks to models";
         QList<Task> tasks = GenerateTaskList(response);
 
         Q_FOREACH(const Task &task, tasks)
         {
-            QString id = task.listId();
             d->tasksModel->addTask(task);
         }
+    }
+}
+
+void Service::onTasksGetSmartListFinished(QVariantMap response, ResponseStatus status)
+{
+    if (status == RTM::OK)
+    {
+        Request *request = qobject_cast<Request*>(sender());
+        QList<Task> tasks = GenerateTaskList(response);
+
+        Q_ASSERT(d->smartListRequestIds.contains(request));
+        QString smartListId = d->smartListRequestIds.value(request);
+
+        Q_ASSERT(d->smartListTasksModels.contains(smartListId));
+        TasksModel *model = d->smartListTasksModels.value(smartListId);
+
+        Q_FOREACH (const Task &task, tasks)
+        {
+            model->addTask(task);
+        }
+
+        // Remove from the map since we've handled this request now.
+        d->smartListRequestIds.remove(request);
     }
 }
 
@@ -325,7 +383,8 @@ void Service::listsDelete(QString timeline, QString listID)
 void Service::listsGetList()
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SIGNAL(listsGetListFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)),
+            this, SIGNAL(listsGetListFinished(QVariantMap,ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", LISTS_GET_LIST);
@@ -475,19 +534,16 @@ void Service::tasksGetList()
     request->sendRequest();
 }
 
-void Service::tasksGetList(QMap<QString, QString> args)
+void Service::tasksGetSmartList(QString id, QString filter)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksGetListFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)),
+            this, SLOT(onTasksGetSmartListFinished(QVariantMap,ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_GET_LIST);
-    if(args.contains("list_id"))
-        request->addArgument("list_id", args.value("list_id"));
-    if(args.contains("filter"))
-        request->addArgument("filter", args.value("filter"));
-    if(args.contains("last_sync"))
-        request->addArgument("last_sync", args.value("last_sync"));
+    request->addArgument("filter", filter);
+    d->smartListRequestIds.insert(request, id);
     request->sendRequest();
 }
 

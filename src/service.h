@@ -29,6 +29,7 @@
 namespace RTM {
 
     class Authentication;
+    class List;
     class ListsModel;
     class FilteredTasksModel;
 
@@ -154,7 +155,7 @@ namespace RTM {
         void tasksComplete(QString timeline, QString listID, QString taskSeriesID, QString taskID);
         void tasksDelete(QString timeline, QString listID, QString taskSeriesID, QString taskID);
         void tasksGetList();
-        void tasksGetList(QMap<QString, QString> args);
+        void tasksGetSmartList(QString id, QString filter);
         void tasksMovePriority(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString direction);
         void tasksMoveTo(QString timeline, QString fromListID, QString toListID, QString taskSeriesID, QString taskID);
         void tasksPostpone(QString timeline, QString listID, QString taskSeriesID, QString taskID);
@@ -190,7 +191,9 @@ namespace RTM {
         void onAuthFinished();
         void onAuthError();
         void onCheckTokenFinished(QVariantMap response, ResponseStatus status);
+        void onLoadedListInfo(List &listInfo);
         void onTasksGetListFinished(QVariantMap response, ResponseStatus status);
+        void onTasksGetSmartListFinished(QVariantMap response, ResponseStatus status);
 
     private:
         class Private;
