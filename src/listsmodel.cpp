@@ -141,6 +141,7 @@ void ListsModel::onGetListFinished(QVariantMap response, ResponseStatus status)
             List newInfo;
             newInfo.load(data);
             d->lists.append(newInfo);
+            emit loadedListInfo(newInfo);
         }
         qSort(d->lists.begin(), d->lists.end(), SortLists);
 

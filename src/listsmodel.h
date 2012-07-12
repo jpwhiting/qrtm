@@ -44,6 +44,10 @@ public:
     virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
 
     friend class Service;
+
+signals:
+    void loadedListInfo(List &listInfo);
+
 protected:
     void clear();
     const List &listFromId(const QString &id);
