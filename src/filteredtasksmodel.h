@@ -35,8 +35,7 @@ public:
     Q_INVOKABLE void setCompleted(bool completed);
 
     Q_INVOKABLE void setListParameters(const QString &id,
-                                       List::SortOrder sortOrder,
-                                       const QString &filter);
+                                       List::SortOrder sortOrder);
 
     Q_INVOKABLE RTM::Task *taskForRow(const int row) const;
 

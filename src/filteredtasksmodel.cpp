@@ -21,6 +21,7 @@
 #include "tasksmodel.h"
 
 #include <QDateTime>
+#include <QtDebug>
 
 namespace RTM
 {
@@ -31,10 +32,6 @@ public:
     QString filter;
     List::SortOrder sortOrder;
     bool completed;
-    // Map of task roles to values.
-    QMap<int, QVariant> filterProperties;
-
-    bool matchesFilter(const QModelIndex &index);
 };
 
 FilteredTasksModel::FilteredTasksModel(QObject *parent) :
@@ -71,22 +68,21 @@ bool FilteredTasksModel::filterAcceptsRow(int sourceRow,
         }
     }
 
-    // If the listId matches, accept it.
-    if (index.data(TasksModel::ListIdRole).toString() == d->listId)
+    // It's a smart list, so accept any listId
+    // Or if the listId matches, accept it.
+    if (d->listId.isEmpty() ||
+        index.data(TasksModel::ListIdRole).toString() == d->listId)
     {
         return true;
     }
 
-    // If it matches the filter, accept it.
     return false;
 }
 
 void FilteredTasksModel::setListParameters(const QString &id,
-                                           List::SortOrder sortOrder,
-                                           const QString &filter)
+                                           List::SortOrder sortOrder)
 {
     d->listId = id;
-    d->filter = filter;
     d->sortOrder = sortOrder;
     invalidateFilter();
     invalidate();
@@ -131,11 +127,6 @@ bool FilteredTasksModel::lessThan(const QModelIndex &left,
     // If sorting by name, only sort by name.
     return QString::compare(left.data().toString(),
                             right.data().toString(), Qt::CaseInsensitive) < 0;
-}
-
-bool FilteredTasksModel::Private::matchesFilter(const QModelIndex &index)
-{
-    // Check if any parts match.
 }
 
 RTM::Task* FilteredTasksModel::taskForRow(const int row) const
