@@ -51,7 +51,7 @@ public:
 
     friend class Service;
 protected:
-    void addTask(const Task &task);
+    void addTask(Task *task);
     void clear();
 
 signals:

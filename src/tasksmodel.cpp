@@ -27,7 +27,7 @@ namespace RTM {
 
 class TasksModel::Private {
 public:
-    QList<Task> tasks;
+    QList<Task*> tasks;
 };
 
 TasksModel::TasksModel(QObject *parent) :
@@ -49,7 +49,7 @@ TasksModel::TasksModel(QObject *parent) :
     setRoleNames(roles);
 }
 
-void TasksModel::addTask(const Task &task)
+void TasksModel::addTask(Task *task)
 {
     beginInsertRows(QModelIndex(), d->tasks.size(), d->tasks.size());
     d->tasks.append(task);
@@ -92,41 +92,41 @@ QVariant TasksModel::data ( const QModelIndex & index, int role) const
 
     if (index.isValid())
     {
-        const Task &task = d->tasks.at(index.row());
+        const Task *task = d->tasks.at(index.row());
         switch (role)
         {
         case Qt::DisplayRole:
-            retval = task.name();
+            retval = task->name();
             break;
         case PriorityRole:
-            retval = task.priority();
+            retval = task->priority();
             break;
         case ListIdRole:
-            retval = task.listId();
+            retval = task->listId();
             break;
         case SeriesIdRole:
-            retval = task.seriesId();
+            retval = task->seriesId();
             break;
         case TaskIdRole:
-            retval = task.taskId();
+            retval = task->taskId();
             break;
         case CompletedRole:
-            retval = task.completed();
+            retval = task->completed();
             break;
         case DueDateRole:
-            retval = task.dueDate();
+            retval = task->dueDate();
             break;
         case TagsRole:
-            retval = task.tags();
+            retval = task->tags();
             break;
         case NotesRole:
-            retval = task.notes();
+            retval = task->notes();
             break;
         case LocationRole:
-            retval = task.location();
+            retval = task->location();
             break;
         case UrlRole:
-            retval = task.url();
+            retval = task->url();
             break;
         }
     }
@@ -137,8 +137,10 @@ QVariant TasksModel::data ( const QModelIndex & index, int role) const
 RTM::Task* TasksModel::taskForRow(const int row) const
 {
     Task * value = 0;
-    if (row >= 0 & row < d->tasks.size())
-        value = &(d->tasks[row]);
+    if (row >= 0 && row < d->tasks.size())
+    {
+        value = d->tasks[row];
+    }
 
     return value;
 }
