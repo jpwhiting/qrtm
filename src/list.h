@@ -33,8 +33,6 @@ public:
     };
 
     List();
-    List(const List &);
-    List &operator=(const List &);
     ~List();
 
     QString name() const;

@@ -26,7 +26,7 @@ namespace RTM {
 
 class ListsModel::Private {
 public:
-    QList<List> lists;
+    QList<List*> lists;
 };
 
 ListsModel::ListsModel(QObject *parent) :
@@ -41,18 +41,17 @@ ListsModel::ListsModel(QObject *parent) :
     setRoleNames(roles);
 }
 
-const List &ListsModel::listFromId(const QString &id)
+List *ListsModel::listFromId(const QString &id)
 {
-    Q_FOREACH(const List &list, d->lists)
+    Q_FOREACH (List *list, d->lists)
     {
-        if (list.id() == id)
+        if (list->id() == id)
         {
-            qDebug() << "Got list with id " << id
-                     << " name " << list.name()
-                     << " and sort order " << list.sortOrder();
             return list;
         }
     }
+
+    return NULL;
 }
 
 void ListsModel::clear()
@@ -91,19 +90,20 @@ QVariant ListsModel::data ( const QModelIndex & index, int role) const
 
     if (index.isValid())
     {
+        List * list = d->lists.at(index.row());
         switch (role)
         {
         case Qt::DisplayRole:
-            retval = d->lists.at(index.row()).name();
+            retval = list->name();
             break;
         case IdRole:
-            retval = d->lists.at(index.row()).id();
+            retval = list->id();
             break;
         case FilterRole:
-            retval = d->lists.at(index.row()).filter();
+            retval = list->filter();
             break;
         case SortOrderRole:
-            retval = d->lists.at(index.row()).sortOrder();
+            retval = list->sortOrder();
             break;
         }
     }
@@ -111,18 +111,18 @@ QVariant ListsModel::data ( const QModelIndex & index, int role) const
     return retval;
 }
 
-bool SortLists(const List &l1, const List &l2)
+bool SortLists(const List *l1, const List *l2)
 {
-    if (l1.isSmart() == l2.isSmart())
+    if (l1->isSmart() == l2->isSmart())
     {
-        if (l1.position() != l2.position())
-            return l1.position() < l2.position();
+        if (l1->position() != l2->position())
+            return l1->position() < l2->position();
         else
-            return l1.name() < l2.name();
+            return l1->name() < l2->name();
     }
     else
         // If l2 is smart, l1 goes first.
-        return (l2.isSmart());
+        return (l2->isSmart());
 }
 
 void ListsModel::onGetListFinished(QVariantMap response, ResponseStatus status)
@@ -135,11 +135,11 @@ void ListsModel::onGetListFinished(QVariantMap response, ResponseStatus status)
         QVariantList lists = response.value("lists").toMap().value("list").toList();
         beginInsertRows(QModelIndex(), 0, lists.size());
         qDebug() << "List items: " << lists.size();
-        Q_FOREACH(const QVariant &info, lists)
+        Q_FOREACH (const QVariant &info, lists)
         {
             QVariantMap data = info.toMap();
-            List newInfo;
-            newInfo.load(data);
+            List *newInfo = new List();
+            newInfo->load(data);
             d->lists.append(newInfo);
             emit loadedListInfo(newInfo);
         }

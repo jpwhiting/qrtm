@@ -199,7 +199,7 @@ namespace RTM {
         void onAuthFinished();
         void onAuthError();
         void onCheckTokenFinished(QVariantMap response, ResponseStatus status);
-        void onLoadedListInfo(List &listInfo);
+        void onLoadedListInfo(List *listInfo);
         void onTasksGetListFinished(QVariantMap response, ResponseStatus status);
         void onTasksGetSmartListFinished(QVariantMap response, ResponseStatus status);
 

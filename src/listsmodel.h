@@ -46,11 +46,11 @@ public:
     friend class Service;
 
 signals:
-    void loadedListInfo(List &listInfo);
+    void loadedListInfo(List *listInfo);
 
 protected:
     void clear();
-    const List &listFromId(const QString &id);
+    List *listFromId(const QString &id);
 protected slots:
     void onGetListFinished(QVariantMap response, ResponseStatus status);
 

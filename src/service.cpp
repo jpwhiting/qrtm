@@ -40,8 +40,8 @@ public:
 
         connect(service, SIGNAL(listsGetListFinished(QVariantMap,ResponseStatus)),
                 listsModel, SLOT(onGetListFinished(QVariantMap,ResponseStatus)));
-        connect(listsModel, SIGNAL(loadedListInfo(List&)),
-                service, SLOT(onLoadedListInfo(List&)));
+        connect(listsModel, SIGNAL(loadedListInfo(List*)),
+                service, SLOT(onLoadedListInfo(List*)));
     }
 
     Authentication * authentication;
@@ -120,18 +120,18 @@ FilteredTasksModel *Service::getTasksModel()
 void Service::setListId(QString id)
 {
     // Get the list parameters from from the listsModel.
-    const List &list = d->listsModel->listFromId(id);
+    List *list = d->listsModel->listFromId(id);
 
-    if (list.isSmart())
+    if (list->isSmart())
     {
-        Q_ASSERT(d->smartListTasksModels.contains(list.id()));
+        Q_ASSERT(d->smartListTasksModels.contains(list->id()));
 
-        TasksModel *model = d->smartListTasksModels.value(list.id());
+        TasksModel *model = d->smartListTasksModels.value(list->id());
         if (d->filteredTasksModel->sourceModel() != model)
             d->filteredTasksModel->setSourceModel(model);
 
         // Give the list parameters to the filtered model
-        d->filteredTasksModel->setListParameters(QString(), list.sortOrder());
+        d->filteredTasksModel->setListParameters(QString(), list->sortOrder());
     }
     else
     {
@@ -140,7 +140,7 @@ void Service::setListId(QString id)
             d->filteredTasksModel->setSourceModel(d->tasksModel);
 
         // Give the list parameters to the filtered model
-        d->filteredTasksModel->setListParameters(id, list.sortOrder());
+        d->filteredTasksModel->setListParameters(id, list->sortOrder());
     }
 }
 
@@ -216,16 +216,16 @@ void Service::onCheckTokenFinished(QVariantMap response, ResponseStatus status)
     }
 }
 
-void Service::onLoadedListInfo(List &listInfo)
+void Service::onLoadedListInfo(List *listInfo)
 {
-    if (listInfo.isSmart())
+    if (listInfo->isSmart())
     {
         // Create a model for this list.
         TasksModel *newModel = new TasksModel(this);
-        d->smartListTasksModels.insert(listInfo.id(), newModel);
+        d->smartListTasksModels.insert(listInfo->id(), newModel);
 
         // Request this list's tasks from the server.
-        tasksGetSmartList(listInfo.id(), listInfo.filter());
+        tasksGetSmartList(listInfo->id(), listInfo->filter());
     }
 }
 

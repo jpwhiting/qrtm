@@ -40,37 +40,6 @@ List::List() : d(new Private)
 {
 }
 
-List::List(const List &rhs)
-    :d(new Private)
-{
-    d->id = rhs.d->id;
-    d->name = rhs.d->name;
-    d->deleted = rhs.d->deleted;
-    d->locked = rhs.d->locked;
-    d->archived = rhs.d->archived;
-    d->position = rhs.d->position;
-    d->smart = rhs.d->smart;
-    d->filter = rhs.d->filter;
-    d->sortOrder = rhs.d->sortOrder;
-}
-
-List &List::operator=(const List &rhs)
-{
-    if (this != &rhs)
-    {
-        d->id = rhs.d->id;
-        d->name = rhs.d->name;
-        d->deleted = rhs.d->deleted;
-        d->locked = rhs.d->locked;
-        d->archived = rhs.d->archived;
-        d->position = rhs.d->position;
-        d->smart = rhs.d->smart;
-        d->filter = rhs.d->filter;
-        d->sortOrder = rhs.d->sortOrder;
-    }
-    return *this;
-}
-
 List::~List()
 {
     delete d;
