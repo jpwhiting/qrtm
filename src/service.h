@@ -32,12 +32,14 @@ namespace RTM {
     class List;
     class ListsModel;
     class FilteredTasksModel;
+    class Task;
 
     class RTMAPISHARED_EXPORT Service : public QObject
     {
         Q_OBJECT
         Q_PROPERTY(RTM::ListsModel * listsModel READ getListsModel)
         Q_PROPERTY(RTM::FilteredTasksModel * tasksModel READ getTasksModel)
+        Q_PROPERTY(RTM::Task * currentTask READ getCurrentTask NOTIFY currentTaskChanged)
 
     public:
         Service(QObject *parent = 0);
@@ -57,11 +59,17 @@ namespace RTM {
 
         Q_INVOKABLE void setListId(QString id);
 
+        // Set the current task to given row of the filtered tasks list model.
+        Q_INVOKABLE void setCurrentTask(int row);
+        Q_INVOKABLE Task *getCurrentTask();
+
     signals:
         // Signal the ui should load the given url in order to authenticate.
         void authenticationLoadUrl(const QUrl &url);
         // Signal authentication is done.
         void authenticationDone(bool success);
+        // Signal chosen task has changed.
+        void currentTaskChanged();
 
         void contactsAddFinished(QVariantMap response, ResponseStatus status);
         void contactsDeleteFinished(QVariantMap response, ResponseStatus status);

@@ -32,9 +32,10 @@ public:
     Private(Service *service)
     {
         authentication = 0;
+        currentTask = 0;
         tasksModel = new TasksModel(service);
-        tasksModelFilter = new FilteredTasksModel;
-        tasksModelFilter->setSourceModel(tasksModel);
+        filteredTasksModel = new FilteredTasksModel;
+        filteredTasksModel->setSourceModel(tasksModel);
         listsModel = new ListsModel(service);
 
         connect(service, SIGNAL(listsGetListFinished(QVariantMap,ResponseStatus)),
@@ -53,7 +54,8 @@ public:
     QMap<Request*, QString> smartListRequestIds;
     QMap<QString, TasksModel *> smartListTasksModels;
 
-    FilteredTasksModel *tasksModelFilter;
+    FilteredTasksModel *filteredTasksModel;
+    Task *currentTask;
 };
 
 Service::Service(QObject *parent) :
@@ -112,7 +114,7 @@ ListsModel *Service::getListsModel()
 
 FilteredTasksModel *Service::getTasksModel()
 {
-    return d->tasksModelFilter;
+    return d->filteredTasksModel;
 }
 
 void Service::setListId(QString id)
@@ -125,21 +127,36 @@ void Service::setListId(QString id)
         Q_ASSERT(d->smartListTasksModels.contains(list.id()));
 
         TasksModel *model = d->smartListTasksModels.value(list.id());
-        if (d->tasksModelFilter->sourceModel() != model)
-            d->tasksModelFilter->setSourceModel(model);
+        if (d->filteredTasksModel->sourceModel() != model)
+            d->filteredTasksModel->setSourceModel(model);
 
         // Give the list parameters to the filtered model
-        d->tasksModelFilter->setListParameters(QString(), list.sortOrder());
+        d->filteredTasksModel->setListParameters(QString(), list.sortOrder());
     }
     else
     {
         // Reset the source model to the main model if needed.
-        if (d->tasksModelFilter->sourceModel() != d->tasksModel)
-            d->tasksModelFilter->setSourceModel(d->tasksModel);
+        if (d->filteredTasksModel->sourceModel() != d->tasksModel)
+            d->filteredTasksModel->setSourceModel(d->tasksModel);
 
         // Give the list parameters to the filtered model
-        d->tasksModelFilter->setListParameters(id, list.sortOrder());
+        d->filteredTasksModel->setListParameters(id, list.sortOrder());
     }
+}
+
+void Service::setCurrentTask(int row)
+{
+    Task * task = d->filteredTasksModel->taskForRow(row);
+    if (task)
+    {
+        d->currentTask = task;
+        emit currentTaskChanged();
+    }
+}
+
+Task *Service::getCurrentTask()
+{
+    return d->currentTask;
 }
 
 void Service::authenticate(Permission p)
@@ -216,9 +233,9 @@ void Service::onTasksGetListFinished(QVariantMap response, ResponseStatus status
 {
     if (status == RTM::OK)
     {
-        QList<Task> tasks = GenerateTaskList(response);
+        QList<Task*> tasks = GenerateTaskList(response);
 
-        Q_FOREACH(const Task &task, tasks)
+        Q_FOREACH (Task *task, tasks)
         {
             d->tasksModel->addTask(task);
         }
@@ -230,7 +247,7 @@ void Service::onTasksGetSmartListFinished(QVariantMap response, ResponseStatus s
     if (status == RTM::OK)
     {
         Request *request = qobject_cast<Request*>(sender());
-        QList<Task> tasks = GenerateTaskList(response);
+        QList<Task*> tasks = GenerateTaskList(response);
 
         Q_ASSERT(d->smartListRequestIds.contains(request));
         QString smartListId = d->smartListRequestIds.value(request);
@@ -238,7 +255,7 @@ void Service::onTasksGetSmartListFinished(QVariantMap response, ResponseStatus s
         Q_ASSERT(d->smartListTasksModels.contains(smartListId));
         TasksModel *model = d->smartListTasksModels.value(smartListId);
 
-        Q_FOREACH (const Task &task, tasks)
+        Q_FOREACH (Task *task, tasks)
         {
             model->addTask(task);
         }
