@@ -46,9 +46,7 @@ public:
         None
     };
 
-    Task();
-    Task(const Task &);
-    Task &operator=(const Task &);
+    Task(QObject *parent = NULL);
     virtual ~Task();
 
     void load(const QVariantMap &data, const QString &listId);
@@ -71,7 +69,7 @@ private:
 };
 
 // Helper method to extract taskGetList result into list of Tasks.
-QList<Task> GenerateTaskList(const QVariantMap &data);
+QList<Task*> GenerateTaskList(const QVariantMap &data);
 
 }
 

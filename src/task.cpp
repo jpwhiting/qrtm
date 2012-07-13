@@ -21,8 +21,6 @@
 #include <QDateTime>
 #include <QStringList>
 
-#include <QtDebug>
-
 namespace RTM {
 
 class Task::Private {
@@ -52,68 +50,9 @@ public:
     QStringList notes;
 };
 
-Task::Task()
-    :d(new Private)
+Task::Task(QObject *parent)
+    :QObject(parent), d(new Private)
 {
-}
-
-Task::Task(const Task &rhs)
-    :d(new Private)
-{
-    d->listId = rhs.d->listId;
-    d->seriesId = rhs.d->seriesId;
-    d->taskId = rhs.d->taskId;
-    d->name = rhs.d->name;
-    d->locationId = rhs.d->locationId;
-    d->url = rhs.d->url;
-    d->created = rhs.d->created;
-    d->modified = rhs.d->modified;
-    d->added = rhs.d->added;
-    d->completed = rhs.d->completed;
-    d->deleted = rhs.d->deleted;
-    d->dueDate = rhs.d->dueDate;
-    d->hasDueTime = rhs.d->hasDueTime;
-    d->priority = rhs.d->priority;
-    d->estimate = rhs.d->estimate;
-    d->postponed = rhs.d->postponed;
-    d->source = rhs.d->source;
-    d->recurrence = rhs.d->recurrence;
-    d->recurrenceEvery = rhs.d->recurrenceEvery;
-
-    d->tags = rhs.d->tags;
-    d->participants = rhs.d->participants;
-    d->notes = rhs.d->notes;
-}
-
-Task &Task::operator=(const Task &rhs)
-{
-    if (this != &rhs)
-    {
-        d->listId = rhs.d->listId;
-        d->seriesId = rhs.d->seriesId;
-        d->taskId = rhs.d->taskId;
-        d->name = rhs.d->name;
-        d->locationId = rhs.d->locationId;
-        d->url = rhs.d->url;
-        d->created = rhs.d->created;
-        d->modified = rhs.d->modified;
-        d->added = rhs.d->added;
-        d->completed = rhs.d->completed;
-        d->deleted = rhs.d->deleted;
-        d->dueDate = rhs.d->dueDate;
-        d->hasDueTime = rhs.d->hasDueTime;
-        d->priority = rhs.d->priority;
-        d->estimate = rhs.d->estimate;
-        d->postponed = rhs.d->postponed;
-        d->source = rhs.d->source;
-        d->recurrence = rhs.d->recurrence;
-        d->recurrenceEvery = rhs.d->recurrenceEvery;
-
-        d->tags = rhs.d->tags;
-        d->participants = rhs.d->participants;
-        d->notes = rhs.d->notes;
-    }
-    return *this;
 }
 
 Task::~Task()
@@ -238,9 +177,9 @@ QStringList Task::notes() const
     return d->notes;
 }
 
-QList<Task> GenerateTaskList(const QVariantMap &data)
+QList<Task*> GenerateTaskList(const QVariantMap &data)
 {
-    QList<Task> resultList;
+    QList<Task*> resultList;
 
     QVariantMap tasksMap = data.value("tasks").toMap();
     QVariantList lists = tasksMap.value("list").toList();
@@ -252,8 +191,8 @@ QList<Task> GenerateTaskList(const QVariantMap &data)
         {
             QVariantMap tasks = series.toMap();
 
-            Task newInfo;
-            newInfo.load(tasks, id);
+            Task* newInfo = new Task();
+            newInfo->load(tasks, id);
             resultList.append(newInfo);
         }
     }
