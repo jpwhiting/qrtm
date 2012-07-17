@@ -32,7 +32,6 @@ public:
     Private(Service *service)
     {
         authentication = 0;
-        currentTask = 0;
         tasksModel = new TasksModel(service);
         filteredTasksModel = new FilteredTasksModel;
         filteredTasksModel->setSourceModel(tasksModel);
@@ -55,7 +54,6 @@ public:
     QMap<QString, TasksModel *> smartListTasksModels;
 
     FilteredTasksModel *filteredTasksModel;
-    Task *currentTask;
 };
 
 Service::Service(QObject *parent) :
@@ -142,21 +140,6 @@ void Service::setListId(QString id)
         // Give the list parameters to the filtered model
         d->filteredTasksModel->setListParameters(id, list->sortOrder());
     }
-}
-
-void Service::setCurrentTask(int row)
-{
-    Task * task = d->filteredTasksModel->taskForRow(row);
-    if (task)
-    {
-        d->currentTask = task;
-        emit currentTaskChanged();
-    }
-}
-
-Task *Service::getCurrentTask()
-{
-    return d->currentTask;
 }
 
 void Service::authenticate(Permission p)
