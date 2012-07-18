@@ -74,7 +74,7 @@ void Authentication::beginAuth()
 {
     if(frob.isEmpty()) {
         frobRequest = new Request(sharedSecret, baseMethodUrl, Signed, this);
-        connect(frobRequest, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SLOT(frobReceived(QVariantMap, ResponseStatus)));
+        connect(frobRequest, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SLOT(frobReceived(QVariantMap, RTM::ResponseStatus)));
         frobRequest->addArgument("api_key", apiKey);
         frobRequest->addArgument("method", "rtm.auth.getFrob");
         frobRequest->sendRequest();
@@ -84,7 +84,7 @@ void Authentication::beginAuth()
     }
 }
 
-void Authentication::frobReceived(QVariantMap response, ResponseStatus status)
+void Authentication::frobReceived(QVariantMap response, RTM::ResponseStatus status)
 {
     if(status == OK) {
         frob = response["frob"].toString();
@@ -113,14 +113,14 @@ void Authentication::requestToken()
     qDebug() << "Authorization completed get token\n";
 
     tokenRequest = new Request(sharedSecret, baseMethodUrl, Signed, this);
-    connect(tokenRequest, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SLOT(tokenReceived(QVariantMap, ResponseStatus)));
+    connect(tokenRequest, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SLOT(tokenReceived(QVariantMap, RTM::ResponseStatus)));
     tokenRequest->addArgument("api_key", apiKey);
     tokenRequest->addArgument("frob", frob);
     tokenRequest->addArgument("method", "rtm.auth.getToken");
     tokenRequest->sendRequest();
 }
 
-void Authentication::tokenReceived(QVariantMap response, ResponseStatus status)
+void Authentication::tokenReceived(QVariantMap response, RTM::ResponseStatus status)
 {
     if(status == OK) {
         token = (response["auth"].toMap())["token"].toString();

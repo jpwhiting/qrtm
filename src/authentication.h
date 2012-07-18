@@ -45,16 +45,16 @@ namespace RTM
     signals:
         void loadAuthUrl(const QUrl &url);
         void authFinished(QVariantMap auth);
-        void authError(QVariantMap response, ResponseStatus status);
+        void authError(QVariantMap response, RTM::ResponseStatus status);
 
     public slots:
         void beginAuth();
         void requestToken();
 
     protected slots:
-        void frobReceived(QVariantMap response, ResponseStatus status);
+        void frobReceived(QVariantMap response, RTM::ResponseStatus status);
         void login();
-        void tokenReceived(QVariantMap response, ResponseStatus status);
+        void tokenReceived(QVariantMap response, RTM::ResponseStatus status);
 
     protected:
         QString apiKey;

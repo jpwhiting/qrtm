@@ -115,8 +115,8 @@ void Request::responseReceived(QNetworkReply * reply)
     QVariantMap result;
     QByteArray response = reply->readAll();
 
-    qDebug() << "Resp url: " << reply->url().toString();
-    qDebug() << "Resp rec: " << QString(response);
+//    qDebug() << "Resp url: " << reply->url().toString();
+//    qDebug() << "Resp rec: " << QString(response);
 
     reply->deleteLater();
 

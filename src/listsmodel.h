@@ -43,16 +43,16 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
 
+    List *listFromId(const QString &id);
+    void clear();
+
     friend class Service;
 
 signals:
-    void loadedListInfo(List *listInfo);
+    void loadedListInfo(RTM::List *listInfo);
 
-protected:
-    void clear();
-    List *listFromId(const QString &id);
 protected slots:
-    void onGetListFinished(QVariantMap response, ResponseStatus status);
+    void onGetListFinished(QVariantMap response, RTM::ResponseStatus status);
 
 private:
     class Private;

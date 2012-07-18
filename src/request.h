@@ -48,7 +48,7 @@ namespace RTM
         void unsignRequest();
 
     signals:
-        void requestFinished(QVariantMap response, ResponseStatus status);
+        void requestFinished(QVariantMap response, RTM::ResponseStatus status);
 
     public slots:
         void sendRequest();

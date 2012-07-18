@@ -32,28 +32,19 @@ public:
     Private(Service *service)
     {
         authentication = 0;
-        tasksModel = new TasksModel(service);
-        filteredTasksModel = new FilteredTasksModel;
-        filteredTasksModel->setSourceModel(tasksModel);
         listsModel = new ListsModel(service);
 
-        connect(service, SIGNAL(listsGetListFinished(QVariantMap,ResponseStatus)),
-                listsModel, SLOT(onGetListFinished(QVariantMap,ResponseStatus)));
-        connect(listsModel, SIGNAL(loadedListInfo(List*)),
-                service, SLOT(onLoadedListInfo(List*)));
+        connect(service, SIGNAL(listsGetListFinished(QVariantMap,RTM::ResponseStatus)),
+                listsModel, SLOT(onGetListFinished(QVariantMap,RTM::ResponseStatus)));
     }
 
     Authentication * authentication;
     QString apiKey;
     QString sharedSecret;
     QString token;
+    QMap <RTM::Request*, QString> requestIds;
 
     ListsModel *listsModel;
-    TasksModel *tasksModel;
-    QMap<Request*, QString> smartListRequestIds;
-    QMap<QString, TasksModel *> smartListTasksModels;
-
-    FilteredTasksModel *filteredTasksModel;
 };
 
 Service::Service(QObject *parent) :
@@ -69,7 +60,7 @@ Service::Service(QString key, QString secret, QObject *parent) :
     d->authentication = new Authentication(key, secret, Read, "", this);
     connect(d->authentication, SIGNAL(authFinished(QVariantMap)),
             this, SLOT(onAuthFinished()));
-    connect(d->authentication, SIGNAL(authError(QVariantMap,ResponseStatus)),
+    connect(d->authentication, SIGNAL(authError(QVariantMap,RTM::ResponseStatus)),
             this, SLOT(onAuthError()));
     connect(d->authentication, SIGNAL(loadAuthUrl(QUrl)),
             this, SIGNAL(authenticationLoadUrl(QUrl)));
@@ -94,7 +85,7 @@ void Service::setKey(QString key, QString secret)
     d->authentication = new Authentication(key, secret, Read, "", this);
     connect(d->authentication, SIGNAL(authFinished(QVariantMap)),
             this, SLOT(onAuthFinished()));
-    connect(d->authentication, SIGNAL(authError(QVariantMap,ResponseStatus)),
+    connect(d->authentication, SIGNAL(authError(QVariantMap,RTM::ResponseStatus)),
             this, SLOT(onAuthError()));
     connect(d->authentication, SIGNAL(loadAuthUrl(QUrl)),
             this, SIGNAL(authenticationLoadUrl(QUrl)));
@@ -108,38 +99,6 @@ Permission Service::getPermission()
 ListsModel *Service::getListsModel()
 {
     return d->listsModel;
-}
-
-FilteredTasksModel *Service::getTasksModel()
-{
-    return d->filteredTasksModel;
-}
-
-void Service::setListId(QString id)
-{
-    // Get the list parameters from from the listsModel.
-    List *list = d->listsModel->listFromId(id);
-
-    if (list->isSmart())
-    {
-        Q_ASSERT(d->smartListTasksModels.contains(list->id()));
-
-        TasksModel *model = d->smartListTasksModels.value(list->id());
-        if (d->filteredTasksModel->sourceModel() != model)
-            d->filteredTasksModel->setSourceModel(model);
-
-        // Give the list parameters to the filtered model
-        d->filteredTasksModel->setListParameters(QString(), list->sortOrder());
-    }
-    else
-    {
-        // Reset the source model to the main model if needed.
-        if (d->filteredTasksModel->sourceModel() != d->tasksModel)
-            d->filteredTasksModel->setSourceModel(d->tasksModel);
-
-        // Give the list parameters to the filtered model
-        d->filteredTasksModel->setListParameters(id, list->sortOrder());
-    }
 }
 
 void Service::authenticate(Permission p)
@@ -157,7 +116,6 @@ void Service::onAuthFinished()
 void Service::onAuthError()
 {
     d->listsModel->clear();
-    d->tasksModel->clear();
     emit authenticationDone(false);
 }
 
@@ -176,15 +134,15 @@ void Service::authCheckToken(QString tok)
 {
     d->token = tok; // Store the token we are checking.
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Unsigned, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)),
-            this, SLOT(onCheckTokenFinished(QVariantMap, ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)),
+            this, SLOT(onCheckTokenFinished(QVariantMap, RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", tok);
     request->addArgument("method", AUTH_CHECK_TOKEN);
     request->sendRequest();
 }
 
-void Service::onCheckTokenFinished(QVariantMap response, ResponseStatus status)
+void Service::onCheckTokenFinished(QVariantMap response, RTM::ResponseStatus status)
 {
     if (status == RTM::OK)
     {
@@ -199,59 +157,10 @@ void Service::onCheckTokenFinished(QVariantMap response, ResponseStatus status)
     }
 }
 
-void Service::onLoadedListInfo(List *listInfo)
-{
-    if (listInfo->isSmart())
-    {
-        // Create a model for this list.
-        TasksModel *newModel = new TasksModel(this);
-        d->smartListTasksModels.insert(listInfo->id(), newModel);
-
-        // Request this list's tasks from the server.
-        tasksGetSmartList(listInfo->id(), listInfo->filter());
-    }
-}
-
-void Service::onTasksGetListFinished(QVariantMap response, ResponseStatus status)
-{
-    if (status == RTM::OK)
-    {
-        QList<Task*> tasks = GenerateTaskList(response);
-
-        Q_FOREACH (Task *task, tasks)
-        {
-            d->tasksModel->addTask(task);
-        }
-    }
-}
-
-void Service::onTasksGetSmartListFinished(QVariantMap response, ResponseStatus status)
-{
-    if (status == RTM::OK)
-    {
-        Request *request = qobject_cast<Request*>(sender());
-        QList<Task*> tasks = GenerateTaskList(response);
-
-        Q_ASSERT(d->smartListRequestIds.contains(request));
-        QString smartListId = d->smartListRequestIds.value(request);
-
-        Q_ASSERT(d->smartListTasksModels.contains(smartListId));
-        TasksModel *model = d->smartListTasksModels.value(smartListId);
-
-        Q_FOREACH (Task *task, tasks)
-        {
-            model->addTask(task);
-        }
-
-        // Remove from the map since we've handled this request now.
-        d->smartListRequestIds.remove(request);
-    }
-}
-
 void Service::contactsAdd(QString timeline, QString contact)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SIGNAL(contactsAddFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SIGNAL(contactsAddFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", CONTACTS_ADD);
@@ -263,7 +172,7 @@ void Service::contactsAdd(QString timeline, QString contact)
 void Service::contactsDelete(QString timeline, QString contactID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SIGNAL(contactsDeleteFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SIGNAL(contactsDeleteFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", CONTACTS_DELETE);
@@ -275,7 +184,7 @@ void Service::contactsDelete(QString timeline, QString contactID)
 void Service::contactsGetList()
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SIGNAL(contactsGetListFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SIGNAL(contactsGetListFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", CONTACTS_GET_LIST);
@@ -285,7 +194,7 @@ void Service::contactsGetList()
 void Service::groupsAdd(QString timeline, QString groupName)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SIGNAL(groupsAddFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SIGNAL(groupsAddFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", GROUPS_ADD);
@@ -297,7 +206,7 @@ void Service::groupsAdd(QString timeline, QString groupName)
 void Service::groupsAddContact(QString timeline, QString groupID, QString contactID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SIGNAL(groupsAddContactFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SIGNAL(groupsAddContactFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", GROUPS_ADD_CONTACT);
@@ -310,7 +219,7 @@ void Service::groupsAddContact(QString timeline, QString groupID, QString contac
 void Service::groupsDelete(QString timeline, QString groupID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SIGNAL(groupsDeleteFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SIGNAL(groupsDeleteFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", GROUPS_DELETE);
@@ -322,7 +231,7 @@ void Service::groupsDelete(QString timeline, QString groupID)
 void Service::groupsGetList()
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SIGNAL(groupsGetListFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SIGNAL(groupsGetListFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", GROUPS_GET_LIST);
@@ -332,7 +241,7 @@ void Service::groupsGetList()
 void Service::groupsRemoveContact(QString timeline, QString groupID, QString contactID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)), this, SIGNAL(groupsRemoveContactFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)), this, SIGNAL(groupsRemoveContactFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", GROUPS_REMOVE_CONTACT);
@@ -345,7 +254,7 @@ void Service::groupsRemoveContact(QString timeline, QString groupID, QString con
 void Service::listsAdd(QString timeline, QString listName, QString filter)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(listsAddFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(listsAddFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", LISTS_ADD);
@@ -359,7 +268,7 @@ void Service::listsAdd(QString timeline, QString listName, QString filter)
 void Service::listsArchive(QString timeline, QString listID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(listsArchiveFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(listsArchiveFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", LISTS_ARCHIVE);
@@ -371,7 +280,7 @@ void Service::listsArchive(QString timeline, QString listID)
 void Service::listsDelete(QString timeline, QString listID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(listsDeleteFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(listsDeleteFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", LISTS_DELETE);
@@ -383,8 +292,8 @@ void Service::listsDelete(QString timeline, QString listID)
 void Service::listsGetList()
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap, ResponseStatus)),
-            this, SIGNAL(listsGetListFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap, RTM::ResponseStatus)),
+            this, SIGNAL(listsGetListFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", LISTS_GET_LIST);
@@ -394,7 +303,7 @@ void Service::listsGetList()
 void Service::listsSetDefaultList(QString timeline, QString listID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(listsSetDefaultListFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(listsSetDefaultListFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", LISTS_SET_DEFAULT_LIST);
@@ -407,7 +316,7 @@ void Service::listsSetDefaultList(QString timeline, QString listID)
 void Service::listsSetName(QString timeline, QString listID, QString listName)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(listsSetNameFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(listsSetNameFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", LISTS_SET_NAME);
@@ -420,7 +329,7 @@ void Service::listsSetName(QString timeline, QString listID, QString listName)
 void Service::listsUnarchive(QString timeline, QString listID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(listsUnarchiveFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(listsUnarchiveFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", LISTS_UNARCHIVE);
@@ -432,7 +341,7 @@ void Service::listsUnarchive(QString timeline, QString listID)
 void Service::locationsGetList()
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(locationsGetListFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(locationsGetListFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", LOCATIONS_GET_LIST);
@@ -442,7 +351,7 @@ void Service::locationsGetList()
 void Service::settingsGetList()
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(settingsGetListFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(settingsGetListFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", SETTINGS_GET_LIST);
@@ -452,7 +361,7 @@ void Service::settingsGetList()
 void Service::tasksAdd(QString timeline, QString taskName, QString listID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksAddFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksAddFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_ADD);
@@ -467,7 +376,7 @@ void Service::tasksAdd(QString timeline, QString taskName, QString listID)
 void Service::tasksSmartAdd(QString timeline, QString taskName, QString listID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksAddFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksAddFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_ADD);
@@ -482,7 +391,7 @@ void Service::tasksSmartAdd(QString timeline, QString taskName, QString listID)
 void Service::tasksAddTags(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString tags)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksAddTagsFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksAddTagsFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_ADD_TAGS);
@@ -497,7 +406,7 @@ void Service::tasksAddTags(QString timeline, QString listID, QString taskSeriesI
 void Service::tasksComplete(QString timeline, QString listID, QString taskSeriesID, QString taskID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksCompleteFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksCompleteFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_COMPLETE);
@@ -511,7 +420,7 @@ void Service::tasksComplete(QString timeline, QString listID, QString taskSeries
 void Service::tasksDelete(QString timeline, QString listID, QString taskSeriesID, QString taskID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksDeleteFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksDeleteFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_DELETE);
@@ -525,9 +434,8 @@ void Service::tasksDelete(QString timeline, QString listID, QString taskSeriesID
 void Service::tasksGetList()
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-//    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksGetListFinished(QVariantMap,ResponseStatus)));
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)),
-            this, SLOT(onTasksGetListFinished(QVariantMap, ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)),
+            this, SIGNAL(tasksGetListFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_GET_LIST);
@@ -537,20 +445,33 @@ void Service::tasksGetList()
 void Service::tasksGetSmartList(QString id, QString filter)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)),
-            this, SLOT(onTasksGetSmartListFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)),
+            this, SLOT(onTasksGetSmartListFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_GET_LIST);
+    request->addArgument("list_id", id);
     request->addArgument("filter", filter);
-    d->smartListRequestIds.insert(request, id);
+    d->requestIds.insert(request, id);
     request->sendRequest();
+}
+
+void Service::onTasksGetSmartListFinished(QVariantMap response, ResponseStatus status)
+{
+    Request * request = qobject_cast<Request*>(sender());
+    Q_ASSERT(request != NULL);
+    Q_ASSERT(d->requestIds.contains(request));
+
+    QString list_id = d->requestIds.value(request);
+    d->requestIds.remove(request);
+
+    emit tasksGetSmartListFinished(list_id, response, status);
 }
 
 void Service::tasksMovePriority(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString direction)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksMovePriorityFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksMovePriorityFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_MOVE_PRIORITY);
@@ -565,7 +486,7 @@ void Service::tasksMovePriority(QString timeline, QString listID, QString taskSe
 void Service::tasksMoveTo(QString timeline, QString fromListID, QString toListID, QString taskSeriesID, QString taskID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksMoveToFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksMoveToFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_MOVE_TO);
@@ -580,7 +501,7 @@ void Service::tasksMoveTo(QString timeline, QString fromListID, QString toListID
 void Service::tasksPostpone(QString timeline, QString listID, QString taskSeriesID, QString taskID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksPostponeFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksPostponeFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_POSTPONE);
@@ -594,7 +515,7 @@ void Service::tasksPostpone(QString timeline, QString listID, QString taskSeries
 void Service::tasksRemoveTags(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString tags)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksRemoveTagsFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksRemoveTagsFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_REMOVE_TAGS);
@@ -609,7 +530,7 @@ void Service::tasksRemoveTags(QString timeline, QString listID, QString taskSeri
 void Service::tasksSetDueDate(QString timeline, QString listID, QString taskSeriesID, QString taskID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksSetDueDateFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetDueDateFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_SET_DUE_DATE);
@@ -623,7 +544,7 @@ void Service::tasksSetDueDate(QString timeline, QString listID, QString taskSeri
 void Service::tasksSetDueDate(QString timeline, QString listID, QString taskSeriesID, QString taskID, QMap<QString, QString>optArgs)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksSetDueDateFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetDueDateFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_SET_DUE_DATE);
@@ -643,7 +564,7 @@ void Service::tasksSetDueDate(QString timeline, QString listID, QString taskSeri
 void Service::tasksSetEstimate(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString estimate)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksSetEstimateFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetEstimateFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_SET_ESTIMATE);
@@ -659,7 +580,7 @@ void Service::tasksSetEstimate(QString timeline, QString listID, QString taskSer
 void Service::tasksSetLocation(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString locationID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksSetLocationFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetLocationFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_SET_LOCATION);
@@ -675,7 +596,7 @@ void Service::tasksSetLocation(QString timeline, QString listID, QString taskSer
 void Service::tasksSetName(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString taskName)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksSetNameFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetNameFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_SET_NAME);
@@ -690,7 +611,7 @@ void Service::tasksSetName(QString timeline, QString listID, QString taskSeriesI
 void Service::tasksSetPriority(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString priority)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksSetPriorityFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetPriorityFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_SET_PRIORITY);
@@ -706,7 +627,7 @@ void Service::tasksSetPriority(QString timeline, QString listID, QString taskSer
 void Service::tasksSetRecurrence(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString repeat)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksSetRecurrenceFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetRecurrenceFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_SET_RECURRENCE);
@@ -722,7 +643,7 @@ void Service::tasksSetRecurrence(QString timeline, QString listID, QString taskS
 void Service::tasksSetTags(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString tags)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksSetTagsFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetTagsFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_SET_TAGS);
@@ -738,7 +659,7 @@ void Service::tasksSetTags(QString timeline, QString listID, QString taskSeriesI
 void Service::tasksSetUrl(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString url)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksSetUrlFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksSetUrlFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_SET_URL);
@@ -754,7 +675,7 @@ void Service::tasksSetUrl(QString timeline, QString listID, QString taskSeriesID
 void Service::tasksUncomplete(QString timeline, QString listID, QString taskSeriesID, QString taskID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksUncompleteFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksUncompleteFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_UNCOMPLETE);
@@ -768,7 +689,7 @@ void Service::tasksUncomplete(QString timeline, QString listID, QString taskSeri
 void Service::tasksNotesAdd(QString timeline, QString listID, QString taskSeriesID, QString taskID, QString noteTitle, QString noteText)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksNotesAddFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksNotesAddFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_NOTES_ADD);
@@ -784,7 +705,7 @@ void Service::tasksNotesAdd(QString timeline, QString listID, QString taskSeries
 void Service::tasksNotesDelete(QString timeline, QString noteID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksNotesDeleteFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksNotesDeleteFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_NOTES_DELETE);
@@ -796,7 +717,7 @@ void Service::tasksNotesDelete(QString timeline, QString noteID)
 void Service::tasksNotesEdit(QString timeline, QString noteID, QString noteTitle, QString noteText)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(tasksNotesEditFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(tasksNotesEditFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TASKS_NOTES_EDIT);
@@ -810,7 +731,7 @@ void Service::tasksNotesEdit(QString timeline, QString noteID, QString noteTitle
 void Service::timeConvert(QString toTimezone)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(timeConvertFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(timeConvertFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TIME_CONVERT);
@@ -821,7 +742,7 @@ void Service::timeConvert(QString toTimezone)
 void Service::timeConvert(QString toTimezone, QMap<QString, QString> optArgs)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(timeConvertFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(timeConvertFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TIME_CONVERT);
@@ -836,7 +757,7 @@ void Service::timeConvert(QString toTimezone, QMap<QString, QString> optArgs)
 void Service::timeParse(QString text)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(timeParseFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(timeParseFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TIME_PARSE);
@@ -847,7 +768,7 @@ void Service::timeParse(QString text)
 void Service::timeParse(QString text, QMap<QString, QString> optArgs)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(timeParseFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(timeParseFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TIME_PARSE);
@@ -862,7 +783,7 @@ void Service::timeParse(QString text, QMap<QString, QString> optArgs)
 void Service::timelinesCreate()
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(timelinesCreateFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(timelinesCreateFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TIMELINES_CREATE);
@@ -872,7 +793,7 @@ void Service::timelinesCreate()
 void Service::timezonesGetList()
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(timezonesGetListFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(timezonesGetListFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("method", TIMEZONES_GET_LIST);
     request->sendRequest();
@@ -881,7 +802,7 @@ void Service::timezonesGetList()
 void Service::transactionsUndo(QString timeline, QString transactionID)
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(transactionsUndoFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(transactionsUndoFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TRANSACTIONS_UNDO);
@@ -893,7 +814,7 @@ void Service::transactionsUndo(QString timeline, QString transactionID)
 void Service::testLogin()
 {
     Request * request = new Request(d->sharedSecret, baseMethodUrl, Signed, this);
-    connect(request, SIGNAL(requestFinished(QVariantMap,ResponseStatus)), this, SIGNAL(testLoginFinished(QVariantMap,ResponseStatus)));
+    connect(request, SIGNAL(requestFinished(QVariantMap,RTM::ResponseStatus)), this, SIGNAL(testLoginFinished(QVariantMap,RTM::ResponseStatus)));
     request->addArgument("api_key", d->apiKey);
     request->addArgument("auth_token", d->token);
     request->addArgument("method", TEST_LOGIN);

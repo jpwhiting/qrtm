@@ -125,7 +125,7 @@ bool SortLists(const List *l1, const List *l2)
         return (l2->isSmart());
 }
 
-void ListsModel::onGetListFinished(QVariantMap response, ResponseStatus status)
+void ListsModel::onGetListFinished(QVariantMap response, RTM::ResponseStatus status)
 {
     qDebug() << "Adding lists data to model";
     if (status == RTM::OK)

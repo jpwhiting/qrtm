@@ -16,8 +16,8 @@
 
  */
 
-#ifndef H
-#define H
+#ifndef RTM_H
+#define RTM_H
 
 #include "libqrtm_global.h"
 #include <QtCore/QString>
