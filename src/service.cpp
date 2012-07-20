@@ -32,10 +32,6 @@ public:
     Private(Service *service)
     {
         authentication = 0;
-        listsModel = new ListsModel(service);
-
-        connect(service, SIGNAL(listsGetListFinished(QVariantMap,RTM::ResponseStatus)),
-                listsModel, SLOT(onGetListFinished(QVariantMap,RTM::ResponseStatus)));
     }
 
     Authentication * authentication;
@@ -43,8 +39,6 @@ public:
     QString sharedSecret;
     QString token;
     QMap <RTM::Request*, QString> requestIds;
-
-    ListsModel *listsModel;
 };
 
 Service::Service(QObject *parent) :
@@ -70,9 +64,6 @@ Service::~Service()
 {
     delete d->authentication;
     d->authentication = 0;
-
-    delete d->listsModel;
-    d->listsModel = 0;
 }
 
 void Service::setKey(QString key, QString secret)
@@ -96,11 +87,6 @@ Permission Service::getPermission()
     return d->authentication->getPermission();
 }
 
-ListsModel *Service::getListsModel()
-{
-    return d->listsModel;
-}
-
 void Service::authenticate(Permission p)
 {
     d->authentication->setPermission(p);
@@ -115,7 +101,6 @@ void Service::onAuthFinished()
 
 void Service::onAuthError()
 {
-    d->listsModel->clear();
     emit authenticationDone(false);
 }
 

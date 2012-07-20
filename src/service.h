@@ -38,8 +38,6 @@ namespace RTM {
     class RTMAPISHARED_EXPORT Service : public QObject
     {
         Q_OBJECT
-        Q_PROPERTY(RTM::ListsModel * listsModel READ getListsModel)
-
     public:
         Service(QObject *parent = 0);
         Service(QString key, QString secret, QObject *parent = 0);
@@ -52,8 +50,6 @@ namespace RTM {
         QString getToken() const;
 
         Permission getPermission();
-
-        Q_INVOKABLE ListsModel *getListsModel();
 
     signals:
         // Signal the ui should load the given url in order to authenticate.
